@@ -17,10 +17,10 @@
 
 **Purpose**: Project initialization and package skeleton
 
-- [ ] T001 Create Python package skeleton: `risus/` directory with empty `__init__.py`, `__main__.py`, `repl.py`, `models.py`, `persistence.py`, `display.py` — risus/
-- [ ] T002 Create `pyproject.toml` with project metadata, `[project.scripts]` entry `cli = "risus.__main__:main"`, and `[project.optional-dependencies] dev = ["pytest"]` — pyproject.toml
-- [ ] T003 [P] Create `tests/` directory with empty `__init__.py` and placeholder test files: `test_models.py`, `test_persistence.py`, `test_repl.py`, `test_display.py` — tests/
-- [ ] T004 [P] Create `.gitignore` covering `__pycache__`, `*.pyc`, `.pytest_cache`, `dist/`, `*.egg-info` — .gitignore
+- [x] T001 Create Python package skeleton: `risus/` directory with empty `__init__.py`, `__main__.py`, `repl.py`, `models.py`, `persistence.py`, `display.py` — risus/
+- [x] T002 Create `pyproject.toml` with project metadata, `[project.scripts]` entry `cli = "risus.__main__:main"`, and `[project.optional-dependencies] dev = ["pytest"]` — pyproject.toml
+- [x] T003 [P] Create `tests/` directory with empty `__init__.py` and placeholder test files: `test_models.py`, `test_persistence.py`, `test_repl.py`, `test_display.py` — tests/
+- [x] T004 [P] Create `.gitignore` covering `__pycache__`, `*.pyc`, `.pytest_cache`, `dist/`, `*.egg-info` — .gitignore
 
 ---
 
@@ -30,11 +30,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement `Player` dataclass with fields `name: str`, `cliche_name: str = ""`, `dice: int = 0` and `BattleState` class with `players: dict[str, Player]`, `session_name: str | None = None`; include `DuplicatePlayerError`, `PlayerNotFoundError`, `SaveNotFoundError` exception classes — risus/models.py
-- [ ] T006 Implement `BattleState` operations: `add_player(name, cliche, dice)`, `switch_cliche(player_name, cliche_name, dice)`, `reduce_dice(player_name, amount)` (clamp ≥ 0, remove from display at 0), `active_players()` (returns players with dice > 0 in insertion order) — risus/models.py
-- [ ] T007 [P] Implement `render(state: BattleState) -> str` in `display.py`: outputs header `"Battle latest state"` (with session name in parens if set), a `=` separator line matching header length, and one line per active player formatted as `"<name>:     <n> dice (<cliche>)"` — risus/display.py
-- [ ] T008 [P] Write unit tests for `Player` and `BattleState` operations covering: add duplicate player, switch cliché, reduce dice (normal, clamp to 0, player removed at 0), active_players ordering — tests/test_models.py
-- [ ] T009 [P] Write unit tests for `display.render`: empty state, single player, multiple players, with/without session name, `=` line length matches header — tests/test_display.py
+- [x] T005 Implement `Player` dataclass with fields `name: str`, `cliche_name: str = ""`, `dice: int = 0` and `BattleState` class with `players: dict[str, Player]`, `session_name: str | None = None`; include `DuplicatePlayerError`, `PlayerNotFoundError`, `SaveNotFoundError` exception classes — risus/models.py
+- [x] T006 Implement `BattleState` operations: `add_player(name, cliche, dice)`, `switch_cliche(player_name, cliche_name, dice)`, `reduce_dice(player_name, amount)` (clamp ≥ 0, remove from display at 0), `active_players()` (returns players with dice > 0 in insertion order) — risus/models.py
+- [x] T007 [P] Implement `render(state: BattleState) -> str` in `display.py`: outputs header `"Battle latest state"` (with session name in parens if set), a `=` separator line matching header length, and one line per active player formatted as `"<name>:     <n> dice (<cliche>)"` — risus/display.py
+- [x] T008 [P] Write unit tests for `Player` and `BattleState` operations covering: add duplicate player, switch cliché, reduce dice (normal, clamp to 0, player removed at 0), active_players ordering — tests/test_models.py
+- [x] T009 [P] Write unit tests for `display.render`: empty state, single player, multiple players, with/without session name, `=` line length matches header — tests/test_display.py
 
 **Checkpoint**: Foundation ready — data model tested, display tested, user story phases can now begin
 
@@ -46,10 +46,10 @@
 
 **Independent Test**: Launch `cli`, type `player add --name "Hanne"`, then `player add --name "Zerox" --cliche "Firearms" --points 3`. Verify both characters appear in the reprinted battle state table. Verify duplicate `player add --name "Hanne"` shows error without crashing.
 
-- [ ] T010 [US1] Implement `RisusRepl(cmd.Cmd)` class skeleton in `repl.py`: set `prompt = "> "`, implement `__init__(self, state: BattleState)` storing state, implement `do_EOF` and `do_exit`/`do_quit` for clean exit (return True), add `default(line)` to print `"Unknown command. Type 'help' for available commands."` — risus/repl.py
-- [ ] T011 [US1] Implement `do_player(self, args: str)` in `RisusRepl`: use `shlex.split` to tokenise `args`, dispatch sub-command `add` to `_player_add(parts)`; for `add` parse `--name` (required), `--cliche` (default `""`), `--points` (default `0`, int) using `argparse.ArgumentParser(exit_on_error=False)`; call `state.add_player()`; catch `DuplicatePlayerError` and print inline error; on success call `display.render(state)` and print result — risus/repl.py
-- [ ] T012 [US1] Implement `main()` in `__main__.py`: parse OS-level args with `argparse` for optional `--load <name>` flag; create a fresh `BattleState`; if no `--load` flag print initial (empty) battle state and start `RisusRepl(state).cmdloop()`; if `--load` given, load save (stub: raise `SaveNotFoundError` for now) and start REPL — risus/__main__.py
-- [ ] T013 [P] [US1] Write unit tests for `do_player add`: add new player, add player with cliche+points, add duplicate player shows error message without exception, add player with no name shows argparse error inline — tests/test_repl.py *(parallel with T010; requires T011 complete before tests are meaningful)*
+- [x] T010 [US1] Implement `RisusRepl(cmd.Cmd)` class skeleton in `repl.py`: set `prompt = "> "`, implement `__init__(self, state: BattleState)` storing state, implement `do_EOF` and `do_exit`/`do_quit` for clean exit (return True), add `default(line)` to print `"Unknown command. Type 'help' for available commands."` — risus/repl.py
+- [x] T011 [US1] Implement `do_player(self, args: str)` in `RisusRepl`: use `shlex.split` to tokenise `args`, dispatch sub-command `add` to `_player_add(parts)`; for `add` parse `--name` (required), `--cliche` (default `""`), `--points` (default `0`, int) using `argparse.ArgumentParser(exit_on_error=False)`; call `state.add_player()`; catch `DuplicatePlayerError` and print inline error; on success call `display.render(state)` and print result — risus/repl.py
+- [x] T012 [US1] Implement `main()` in `__main__.py`: parse OS-level args with `argparse` for optional `--load <name>` flag; create a fresh `BattleState`; if no `--load` flag print initial (empty) battle state and start `RisusRepl(state).cmdloop()`; if `--load` given, load save (stub: raise `SaveNotFoundError` for now) and start REPL — risus/__main__.py
+- [x] T013 [P] [US1] Write unit tests for `do_player add`: add new player, add player with cliche+points, add duplicate player shows error message without exception, add player with no name shows argparse error inline — tests/test_repl.py *(parallel with T010; requires T011 complete before tests are meaningful)*
 
 **Checkpoint**: US1 complete — `cli` launches, `player add` works, duplicate error handled, battle state reprints after each add
 

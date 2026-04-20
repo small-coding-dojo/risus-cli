@@ -1,0 +1,21 @@
+{
+  "completed_tasks": ["T001", "T002", "T003", "T004", "T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013"],
+  "failed_tasks": [],
+  "files_changed": [
+    "risus/__init__.py",
+    "risus/__main__.py",
+    "risus/repl.py",
+    "risus/models.py",
+    "risus/persistence.py",
+    "risus/display.py",
+    "tests/__init__.py",
+    "tests/test_models.py",
+    "tests/test_persistence.py",
+    "tests/test_repl.py",
+    "tests/test_display.py",
+    "pyproject.toml",
+    ".gitignore",
+    "specs/001-risus-cli-poc/tasks.md"
+  ],
+  "status": "done"
+}
