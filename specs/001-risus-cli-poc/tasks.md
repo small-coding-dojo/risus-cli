@@ -61,8 +61,8 @@
 
 **Independent Test**: With "Hanne" in session, type `cliche switch --name "Magic spell" --points 4 --target "Hanne"`. Verify reprinted state shows "Hanne: 4 dice (Magic spell)". Verify targeting a non-existent player shows inline error.
 
-- [ ] T014 [US2] Implement `do_cliche(self, args: str)` in `RisusRepl`: use `shlex.split` to tokenise, dispatch sub-commands `switch` and `reduce-by`; for `switch` parse `--name` (required), `--points` (required, int ≥ 0), `--target` (required) with `argparse`; call `state.switch_cliche()`; catch `PlayerNotFoundError` and print inline error; on success call `display.render(state)` and print — risus/repl.py
-- [ ] T015 [P] [US2] Write unit tests for `do_cliche switch`: switch cliche on existing player updates state and reprints, targeting unknown player shows error without exception, `--points 0` is accepted — tests/test_repl.py
+- [x] T014 [US2] Implement `do_cliche(self, args: str)` in `RisusRepl`: use `shlex.split` to tokenise, dispatch sub-commands `switch` and `reduce-by`; for `switch` parse `--name` (required), `--points` (required, int ≥ 0), `--target` (required) with `argparse`; call `state.switch_cliche()`; catch `PlayerNotFoundError` and print inline error; on success call `display.render(state)` and print — risus/repl.py
+- [x] T015 [P] [US2] Write unit tests for `do_cliche switch`: switch cliche on existing player updates state and reprints, targeting unknown player shows error without exception, `--points 0` is accepted — tests/test_repl.py
 
 **Checkpoint**: US2 complete — `cliche switch` updates player's active cliche and reprints state
 
@@ -74,8 +74,8 @@
 
 **Independent Test**: With "Hanne" at 4 dice, type `cliche reduce-by --amount 2 --target "Hanne"`. Verify state shows "Hanne: 2 dice". Reduce by 5 more and verify Hanne no longer appears.
 
-- [ ] T016 [US3] Implement `reduce-by` dispatch inside `do_cliche` in `RisusRepl`: parse `--amount` (required, int ≥ 1) and `--target` (required) with `argparse`; call `state.reduce_dice()`; catch `PlayerNotFoundError` and print inline error; on success call `display.render(state)` and print — risus/repl.py
-- [ ] T017 [P] [US3] Write unit tests for `do_cliche reduce-by`: normal reduction, clamp at 0 (player removed from active list), targeting unknown player shows error, `--amount` missing shows argparse error inline — tests/test_repl.py
+- [x] T016 [US3] Implement `reduce-by` dispatch inside `do_cliche` in `RisusRepl`: parse `--amount` (required, int ≥ 1) and `--target` (required) with `argparse`; call `state.reduce_dice()`; catch `PlayerNotFoundError` and print inline error; on success call `display.render(state)` and print — risus/repl.py
+- [x] T017 [P] [US3] Write unit tests for `do_cliche reduce-by`: normal reduction, clamp at 0 (player removed from active list), targeting unknown player shows error, `--amount` missing shows argparse error inline — tests/test_repl.py
 
 **Checkpoint**: US3 complete — `cliche reduce-by` reduces dice, removes eliminated players from display
 
@@ -87,11 +87,11 @@
 
 **Independent Test**: In a live session add two players, type `save --name "Builders' Shack"`, quit, relaunch with `cli --load "Builders' Shack"`, verify full battle state and session name in header are restored.
 
-- [ ] T018 [US4] Implement `persistence.py`: `_slug(name: str) -> str` using `re.sub(r'[^a-zA-Z0-9_-]', '_', name).lower()`; `_save_dir() -> Path` returning `Path.home() / ".risus" / "saves"` (creates dir on first call); `save(state: BattleState, name: str)` serialises to JSON `{"name": name, "players": [...]}` and writes to `_save_dir() / (_slug(name) + ".json")`; `load(name: str) -> BattleState` reads file, raises `SaveNotFoundError` if not found, deserialises into `BattleState` with `session_name` set — risus/persistence.py
-- [ ] T019 [US4] Implement `do_save(self, args: str)` in `RisusRepl`: parse `--name` (required); call `persistence.save(state, name)`; set `state.session_name = name`; print `display.render(state)` — risus/repl.py
-- [ ] T020 [US4] Wire up `--load` in `__main__.py`: replace stub with real `persistence.load(name)` call; on `SaveNotFoundError` print `"Save '<name>' not found"` to stderr and `sys.exit(1)`; on success set loaded state into `RisusRepl` and start `cmdloop()` printing initial battle state first — risus/__main__.py
-- [ ] T021 [P] [US4] Write unit tests for `persistence.py`: save round-trip (save then load returns equivalent BattleState), load missing save raises `SaveNotFoundError`, special chars in name are slugified, overwrite same name works, loaded state has `session_name` set — tests/test_persistence.py
-- [ ] T022 [P] [US4] Write integration test using `subprocess`: launch `cli`, add players, save, quit, relaunch with `--load`, verify stdout contains player names and session name in header — tests/test_repl.py
+- [x] T018 [US4] Implement `persistence.py`: `_slug(name: str) -> str` using `re.sub(r'[^a-zA-Z0-9_-]', '_', name).lower()`; `_save_dir() -> Path` returning `Path.home() / ".risus" / "saves"` (creates dir on first call); `save(state: BattleState, name: str)` serialises to JSON `{"name": name, "players": [...]}` and writes to `_save_dir() / (_slug(name) + ".json")`; `load(name: str) -> BattleState` reads file, raises `SaveNotFoundError` if not found, deserialises into `BattleState` with `session_name` set — risus/persistence.py
+- [x] T019 [US4] Implement `do_save(self, args: str)` in `RisusRepl`: parse `--name` (required); call `persistence.save(state, name)`; set `state.session_name = name`; print `display.render(state)` — risus/repl.py
+- [x] T020 [US4] Wire up `--load` in `__main__.py`: replace stub with real `persistence.load(name)` call; on `SaveNotFoundError` print `"Save '<name>' not found"` to stderr and `sys.exit(1)`; on success set loaded state into `RisusRepl` and start `cmdloop()` printing initial battle state first — risus/__main__.py
+- [x] T021 [P] [US4] Write unit tests for `persistence.py`: save round-trip (save then load returns equivalent BattleState), load missing save raises `SaveNotFoundError`, special chars in name are slugified, overwrite same name works, loaded state has `session_name` set — tests/test_persistence.py
+- [x] T022 [P] [US4] Write integration test using `subprocess`: launch `cli`, add players, save, quit, relaunch with `--load`, verify stdout contains player names and session name in header — tests/test_repl.py
 
 **Checkpoint**: US4 complete — save/load cycle works end-to-end across process boundaries
 
@@ -101,11 +101,11 @@
 
 **Purpose**: Wiring, edge cases, and final validation
 
-- [ ] T023 Add `help` text (docstrings) to all `do_*` methods in `RisusRepl` so `cmd.Cmd`'s built-in `help` command displays useful per-command descriptions — risus/repl.py
-- [ ] T024 [P] Handle `argparse` errors inline: subclass `ArgumentParser` or set `exit_on_error=False` on all parsers and catch `argparse.ArgumentError` / `SystemExit` to print error message inline rather than exiting the REPL process — risus/repl.py
-- [ ] T025 [P] Validate `pyproject.toml` entry point: run `pip install -e .` and confirm `cli` launches without import errors, then run `python -m risus` and confirm equivalent behaviour — pyproject.toml
-- [ ] T026 [P] Run `pytest` against all test files and confirm all pass; fix any failures — tests/
-- [ ] T027 [P] Manual walkthrough of quickstart.md scenario end-to-end: add Hanne, add Zerox, switch cliche, reduce dice, save, quit, reload — verify output matches expected display format from contracts/command-schema.md
+- [x] T023 Add `help` text (docstrings) to all `do_*` methods in `RisusRepl` so `cmd.Cmd`'s built-in `help` command displays useful per-command descriptions — risus/repl.py
+- [x] T024 [P] Handle `argparse` errors inline: subclass `ArgumentParser` or set `exit_on_error=False` on all parsers and catch `argparse.ArgumentError` / `SystemExit` to print error message inline rather than exiting the REPL process — risus/repl.py
+- [x] T025 [P] Validate `pyproject.toml` entry point: run `pip install -e .` and confirm `cli` launches without import errors, then run `python -m risus` and confirm equivalent behaviour — pyproject.toml
+- [x] T026 [P] Run `pytest` against all test files and confirm all pass; fix any failures — tests/
+- [x] T027 [P] Manual walkthrough of quickstart.md scenario end-to-end: add Hanne, add Zerox, switch cliche, reduce dice, save, quit, reload — verify output matches expected display format from contracts/command-schema.md
 
 ---
 

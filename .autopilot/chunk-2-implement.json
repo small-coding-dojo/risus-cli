@@ -1,0 +1,13 @@
+{
+  "completed_tasks": ["T014", "T015", "T016", "T017", "T018", "T019", "T020", "T021", "T022", "T023", "T024", "T025", "T026", "T027"],
+  "failed_tasks": [],
+  "files_changed": [
+    "risus/repl.py",
+    "risus/persistence.py",
+    "risus/__main__.py",
+    "tests/test_repl.py",
+    "tests/test_persistence.py",
+    "specs/001-risus-cli-poc/tasks.md"
+  ],
+  "status": "done"
+}

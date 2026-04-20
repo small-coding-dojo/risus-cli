@@ -1,0 +1,9 @@
+{
+  "findings_count": 1,
+  "fixes_applied": [
+    "risus/repl.py:240",
+    "tests/test_repl.py:328"
+  ],
+  "fixes_skipped": [],
+  "status": "done"
+}

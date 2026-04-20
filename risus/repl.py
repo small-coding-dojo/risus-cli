@@ -7,9 +7,11 @@ import cmd
 import shlex
 
 from risus import display
+from risus import persistence
 from risus.models import (
     BattleState,
     DuplicatePlayerError,
+    PlayerNotFoundError,
 )
 
 
@@ -120,4 +122,155 @@ class RisusRepl(cmd.Cmd):
             print(str(exc))
             return
 
+        print(display.render(self.state))
+
+    # ------------------------------------------------------------------
+    # cliche command
+    # ------------------------------------------------------------------
+
+    def do_cliche(self, args: str) -> None:
+        """Manage player clichés in the current battle.
+
+        Usage:
+            cliche switch --name <cliche-name> --points <n> --target <player>
+            cliche reduce-by --amount <n> --target <player>
+
+        Sub-commands:
+            switch      Replace a player's active cliché and dice pool.
+            reduce-by   Reduce a player's dice pool (clamped at 0).
+        """
+        try:
+            parts = shlex.split(args)
+        except ValueError as exc:
+            print(f"Parse error: {exc}")
+            return
+
+        if not parts:
+            print(
+                "Usage: cliche switch --name <cliche-name> --points <n> --target <player>\n"
+                "       cliche reduce-by --amount <n> --target <player>"
+            )
+            return
+
+        sub = parts[0]
+        if sub == "switch":
+            self._cliche_switch(parts[1:])
+        elif sub == "reduce-by":
+            self._cliche_reduce_by(parts[1:])
+        else:
+            print(f"Unknown sub-command '{sub}'. Try: cliche switch, cliche reduce-by")
+
+    def _cliche_switch(self, parts: list[str]) -> None:
+        """Parse and execute the 'cliche switch' sub-command."""
+        parser = _InlineArgumentParser(prog="cliche switch", add_help=False)
+        parser.add_argument("--name", required=True)
+        parser.add_argument("--points", type=int, required=True)
+        parser.add_argument("--target", required=True)
+
+        try:
+            ns = parser.parse_args(parts)
+        except (argparse.ArgumentError, SystemExit) as exc:
+            print(f"Error: {exc}")
+            return
+
+        try:
+            self.state.switch_cliche(ns.target, cliche_name=ns.name, dice=ns.points)
+        except PlayerNotFoundError as exc:
+            print(str(exc))
+            return
+
+        print(display.render(self.state))
+
+    def _cliche_reduce_by(self, parts: list[str]) -> None:
+        """Parse and execute the 'cliche reduce-by' sub-command."""
+        parser = _InlineArgumentParser(prog="cliche reduce-by", add_help=False)
+        parser.add_argument("--amount", type=int, required=True)
+        parser.add_argument("--target", required=True)
+
+        try:
+            ns = parser.parse_args(parts)
+        except (argparse.ArgumentError, SystemExit) as exc:
+            print(f"Error: {exc}")
+            return
+
+        try:
+            self.state.reduce_dice(ns.target, ns.amount)
+        except PlayerNotFoundError as exc:
+            print(str(exc))
+            return
+
+        print(display.render(self.state))
+
+    # ------------------------------------------------------------------
+    # save command
+    # ------------------------------------------------------------------
+
+    def do_save(self, args: str) -> None:
+        """Persist the current battle state to a named save slot.
+
+        Usage:
+            save --name <save-name>
+
+        Flags:
+            --name   Save slot name. Overwrites an existing slot with the same name.
+        """
+        try:
+            parts = shlex.split(args)
+        except ValueError as exc:
+            print(f"Parse error: {exc}")
+            return
+
+        parser = _InlineArgumentParser(prog="save", add_help=False)
+        parser.add_argument("--name", required=True)
+
+        try:
+            ns = parser.parse_args(parts)
+        except (argparse.ArgumentError, SystemExit) as exc:
+            print(f"Error: {exc}")
+            return
+
+        try:
+            persistence.save(self.state, ns.name)
+        except OSError as exc:
+            print(f"Save failed: {exc}")
+            return
+
+        self.state.session_name = ns.name
+        print(display.render(self.state))
+
+    # ------------------------------------------------------------------
+    # load command
+    # ------------------------------------------------------------------
+
+    def do_load(self, args: str) -> None:
+        """Restore battle state from a named save slot.
+
+        Usage:
+            load --name <save-name>
+
+        Flags:
+            --name   Save slot name to restore.
+        """
+        try:
+            parts = shlex.split(args)
+        except ValueError as exc:
+            print(f"Parse error: {exc}")
+            return
+
+        parser = _InlineArgumentParser(prog="load", add_help=False)
+        parser.add_argument("--name", required=True)
+
+        try:
+            ns = parser.parse_args(parts)
+        except (argparse.ArgumentError, SystemExit) as exc:
+            print(f"Error: {exc}")
+            return
+
+        try:
+            new_state = persistence.load(ns.name)
+        except Exception as exc:
+            print(f"Load failed: {exc}")
+            return
+
+        self.state = new_state
         print(display.render(self.state))

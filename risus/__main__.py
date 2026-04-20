@@ -24,7 +24,6 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.load:
-        # Stub: real persistence will be wired in T020
         try:
             from risus import persistence  # noqa: PLC0415
             state = persistence.load(args.load)
