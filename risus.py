@@ -10,6 +10,7 @@ class Player:
         self.name = name
         self.cliche = cliche
         self.dice = dice  # None = unknown
+        self.lost_dice = 0  # cumulative losses when dice pool is unknown
 
 
 class Battle:
@@ -33,12 +34,15 @@ def show_state(battle: Battle):
     if not battle.players:
         print("  (no players)")
     else:
-        print(f"  {'NAME':<16} {'DICE':>4}  CLICHE")
-        print(f"  {'-'*16} {'-'*4}  {'-'*16}")
+        print(f"  {'NAME':<16} {'DICE':>9}  CLICHE")
+        print(f"  {'-'*16} {'-'*9}  {'-'*16}")
         for p in battle.players:
             cliche = p.cliche if p.cliche else "(none)"
-            dice_str = "?" if p.dice is None else str(p.dice)
-            print(f"  {p.name:<16} {dice_str:>4}  {cliche}")
+            if p.dice is None:
+                dice_str = f"? (-{p.lost_dice})" if p.lost_dice else "?"
+            else:
+                dice_str = str(p.dice)
+            print(f"  {p.name:<16} {dice_str:>9}  {cliche}")
     print()
 
 
@@ -107,14 +111,20 @@ def reduce_dice(battle: Battle):
         input("  Press Enter...")
         return
     for i, p in enumerate(battle.players, 1):
-        dice_str = "?" if p.dice is None else str(p.dice)
+        if p.dice is None:
+            dice_str = f"? (-{p.lost_dice})" if p.lost_dice else "?"
+        else:
+            dice_str = str(p.dice)
         print(f"  {i}. {p.name}  ({dice_str} dice)")
     choice = prompt_int("  Pick player: ")
     if choice is None or choice < 1 or choice > len(battle.players):
         return
     player = battle.players[choice - 1]
     if player.dice is None:
-        dead = input(f"  {player.name} has unknown dice. Are they dead? [y/n]: ").strip().lower()
+        amount = prompt_int("  How many dice lost: ")
+        if amount and amount > 0:
+            player.lost_dice += amount
+        dead = input(f"  Is {player.name} dead? [y/n]: ").strip().lower()
         if dead == "y":
             battle.players.remove(player)
         return
