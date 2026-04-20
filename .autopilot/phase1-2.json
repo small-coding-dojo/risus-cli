@@ -1,0 +1,12 @@
+{
+  "feature_dir": "/home/sauron/risus-cli/risus-cli/specs/001-risus-cli-poc",
+  "spec_file": "/home/sauron/risus-cli/risus-cli/specs/001-risus-cli-poc/spec.md",
+  "user_story_count": 4,
+  "integration_point_count": 0,
+  "clarifications_made": 2,
+  "key_decisions": [
+    "0-dice players are removed from the battle state display entirely",
+    "Interactive REPL model (text-adventure shell) — not discrete CLI invocations; launch once, type commands at > prompt"
+  ],
+  "status": "done"
+}

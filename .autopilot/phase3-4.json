@@ -1,0 +1,21 @@
+{
+  "artifacts": [
+    "specs/001-risus-cli-poc/plan.md",
+    "specs/001-risus-cli-poc/research.md",
+    "specs/001-risus-cli-poc/data-model.md",
+    "specs/001-risus-cli-poc/quickstart.md",
+    "specs/001-risus-cli-poc/contracts/command-schema.md",
+    "specs/001-risus-cli-poc/tasks.md"
+  ],
+  "total_task_count": 27,
+  "story_phases": [
+    { "story_id": "Setup", "task_count": 4, "task_ids": ["T001", "T002", "T003", "T004"] },
+    { "story_id": "Foundational", "task_count": 5, "task_ids": ["T005", "T006", "T007", "T008", "T009"] },
+    { "story_id": "US1", "task_count": 4, "task_ids": ["T010", "T011", "T012", "T013"] },
+    { "story_id": "US2", "task_count": 2, "task_ids": ["T014", "T015"] },
+    { "story_id": "US3", "task_count": 2, "task_ids": ["T016", "T017"] },
+    { "story_id": "US4", "task_count": 5, "task_ids": ["T018", "T019", "T020", "T021", "T022"] },
+    { "story_id": "Polish", "task_count": 5, "task_ids": ["T023", "T024", "T025", "T026", "T027"] }
+  ],
+  "status": "done"
+}
