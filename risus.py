@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Risus CLI - text adventure style battle manager (POC)."""
 
+import json
 import os
 import sys
 
@@ -102,6 +103,29 @@ def switch_cliche(battle: Battle):
     player.dice = dice
 
 
+def save_battle(battle: Battle):
+    clear()
+    show_state(battle)
+    print("[ Save Battle ]")
+    name = input("  Save name: ").strip()
+    if not name:
+        print("  Cancelled.")
+        input("  Press Enter...")
+        return
+    filename = f"{name}.json"
+    data = {
+        "name": name,
+        "players": [
+            {"name": p.name, "cliche": p.cliche, "dice": p.dice, "lost_dice": p.lost_dice}
+            for p in battle.players
+        ],
+    }
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
+    print(f"  Saved to {filename}")
+    input("  Press Enter...")
+
+
 def reduce_dice(battle: Battle):
     clear()
     show_state(battle)
@@ -145,7 +169,8 @@ def main():
         print("  1. Add player")
         print("  2. Switch cliche")
         print("  3. Reduce dice")
-        print("  4. Quit")
+        print("  4. Save")
+        print("  5. Quit")
         print()
         choice = input("> ").strip()
 
@@ -156,6 +181,8 @@ def main():
         elif choice == "3":
             reduce_dice(battle)
         elif choice == "4":
+            save_battle(battle)
+        elif choice == "5":
             sys.exit(0)
 
 
