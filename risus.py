@@ -126,6 +126,33 @@ def save_battle(battle: Battle):
     input("  Press Enter...")
 
 
+def load_battle(battle: Battle):
+    clear()
+    show_state(battle)
+    print("[ Load Battle ]")
+    saves = sorted(f for f in os.listdir(".") if f.endswith(".json"))
+    if not saves:
+        print("  No save files found.")
+        input("  Press Enter...")
+        return
+    for i, f in enumerate(saves, 1):
+        print(f"  {i}. {f[:-5]}")
+    choice = prompt_int("  Pick save: ")
+    if choice is None or choice < 1 or choice > len(saves):
+        return
+    filename = saves[choice - 1]
+    with open(filename) as f:
+        data = json.load(f)
+    battle.players = [
+        Player(p["name"], p.get("cliche", ""), p.get("dice"), )
+        for p in data.get("players", [])
+    ]
+    for p, pd in zip(battle.players, data.get("players", [])):
+        p.lost_dice = pd.get("lost_dice", 0)
+    print(f"  Loaded {filename}")
+    input("  Press Enter...")
+
+
 def reduce_dice(battle: Battle):
     clear()
     show_state(battle)
@@ -170,7 +197,8 @@ def main():
         print("  2. Switch cliche")
         print("  3. Reduce dice")
         print("  4. Save")
-        print("  5. Quit")
+        print("  5. Load")
+        print("  6. Quit")
         print()
         choice = input("> ").strip()
 
@@ -183,6 +211,8 @@ def main():
         elif choice == "4":
             save_battle(battle)
         elif choice == "5":
+            load_battle(battle)
+        elif choice == "6":
             sys.exit(0)
 
 
