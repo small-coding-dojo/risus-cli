@@ -1,5 +1,15 @@
 # Risus CLI
 
+## Execution requirements
+
+
+``` bash
+. ./.venv/bin/activate
+pip install --editable .
+python3 -m risus
+deactivate
+```
+
 ## Example Session
 
 ```text
