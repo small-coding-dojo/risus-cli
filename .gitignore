@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+.venv/
+venv/
+env/
+.env
+
+# OMC (oh-my-claudecode) - ephemeral state, keep memory/config
+.omc/state/
+.omc/sessions/
+.omc/logs/
+.omc/notepad.md
+
+# Battle save files (generated at runtime)
+Current-Battle.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
