@@ -6,10 +6,10 @@ import sys
 
 
 class Player:
-    def __init__(self, name, cliche="", dice=0):
+    def __init__(self, name, cliche="", dice=None):
         self.name = name
         self.cliche = cliche
-        self.dice = dice
+        self.dice = dice  # None = unknown
 
 
 class Battle:
@@ -37,7 +37,8 @@ def show_state(battle: Battle):
         print(f"  {'-'*16} {'-'*4}  {'-'*16}")
         for p in battle.players:
             cliche = p.cliche if p.cliche else "(none)"
-            print(f"  {p.name:<16} {p.dice:>4}  {cliche}")
+            dice_str = "?" if p.dice is None else str(p.dice)
+            print(f"  {p.name:<16} {dice_str:>4}  {cliche}")
     print()
 
 
@@ -69,9 +70,9 @@ def add_player(battle: Battle):
         return
     cliche = input("  Starting cliche (leave blank for none): ").strip()
     if cliche:
-        dice = prompt_int("  Dice for that cliche: ") or 0
+        dice = prompt_int("  Dice for that cliche (leave blank if unknown): ")
     else:
-        dice = 0
+        dice = None
     battle.players.append(Player(name, cliche, dice))
 
 
@@ -92,7 +93,7 @@ def switch_cliche(battle: Battle):
     cliche = input(f"  New cliche for {player.name}: ").strip()
     if not cliche:
         return
-    dice = prompt_int("  Dice: ") or player.dice
+    dice = prompt_int("  Dice (leave blank if unknown): ")
     player.cliche = cliche
     player.dice = dice
 
@@ -106,11 +107,17 @@ def reduce_dice(battle: Battle):
         input("  Press Enter...")
         return
     for i, p in enumerate(battle.players, 1):
-        print(f"  {i}. {p.name}  ({p.dice} dice)")
+        dice_str = "?" if p.dice is None else str(p.dice)
+        print(f"  {i}. {p.name}  ({dice_str} dice)")
     choice = prompt_int("  Pick player: ")
     if choice is None or choice < 1 or choice > len(battle.players):
         return
     player = battle.players[choice - 1]
+    if player.dice is None:
+        dead = input(f"  {player.name} has unknown dice. Are they dead? [y/n]: ").strip().lower()
+        if dead == "y":
+            battle.players.remove(player)
+        return
     amount = prompt_int(f"  Reduce by how many dice (current: {player.dice}): ")
     if amount is None:
         return
