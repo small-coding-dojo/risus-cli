@@ -1,77 +1,38 @@
-# Risus CLI
+# Risus CLI — Multiplayer Battle Tracker
 
-## Example Session
+A multiplayer CLI battle tracker for the [Risus RPG](http://www.risusiverse.com/) system. Multiple players connect from separate terminals to a shared server and manage a single battle in real time.
 
-```text
-$ cli player add --name "Hanne"
-Battle latest state
-===================
-(Name):    (proficiency / skill level / life points) (Skill name used in battle)
+## Features
 
-Hanne:     0 dice ()
+- Shared battle state — all clients see the same players and dice counts
+- Per-player edit locks — prevents two players from editing the same character simultaneously
+- Named server-side save/load — battle snapshots persist across sessions
+- Presence indicator — see who else is connected
 
-$ cli cliche switch --name "Magic spell" --points 4 --target "Hanne"
-Battle latest state
-===================
-(Name):    (number of dice) (Cliché used in battle)
+## Quickstart
 
-Hanne:     4 dice (Magic spell)
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full setup, running, and testing instructions.
 
-$ cli player add --name "Zerox" --cliche "Firearms" --points 3
-Battle latest state
-===================
-(Name):    (proficiency / skill level / life points) (Skill name used in battle)
+```bash
+# Start the stack
+podman-compose up -d   # or: docker compose up -d
 
-Hanne:     4 dice (Magic spell)
-Zerox:     3 dice (Firearms)
-
-$ cli cliche reduce-by --amount 2 --target "Hanne"
-Battle latest state
-===================
-(Name):    (number of dice) (Cliché used in battle)
-
-Hanne:     2 dice (Magic spell)
-Zerox:     3 dice (Firearms)
-
-$ cli cliche switch --name "Throw stones" --points 4 --target "Hanne"
-Battle latest state
-===================
-(Name):    (number of dice) (Cliché used in battle)
-
-Hanne:     4 dice (Throw stones)
-Zerox:     3 dice (Firearms)
-
-$ cli save --name "Builders' Shack"
-Battle latest state (Builders' Shack)
-=====================================
-(Name):    (number of dice) (Cliché used in battle)
-
-Hanne:     4 dice (Throw stones)
-Zerox:     3 dice (Firearms)
-
-$ cli load --name "Builders' Shack"
-Battle latest state (Builders' Shack)
-=====================================
-(Name):    (number of dice) (Cliché used in battle)
-
-Hanne:     4 dice (Throw stones)
-Zerox:     3 dice (Firearms)
+# Run the CLI (in each terminal)
+python risus.py
+# → Server address [localhost:8765]: 
+# → Your name: Alice
 ```
 
-## Design
+## Architecture
 
-The design of the CLI commands and parameters is based on how the kubernetes and
-docker CLIs work. The idea is to specify the resource first, then the action, then the
-arguments or attributes required to satisfy the action.
+```
+risus.py (CLI)  ◄── WebSocket ──►  risus-server (FastAPI)  ◄── SQL ──►  Postgres 16
+```
 
-## Candidate Libraries for CLI parsing
+- `risus-server`: FastAPI app on port 8765, WebSocket endpoint `/ws/{name}`, REST at `/state`, `/saves`, `/healthz`
+- `Postgres`: stores players, locks (audit), and named saves
+- `risus.py`: thin WS client; all state comes from server broadcasts
 
-- golang cobra
-- rust clap
-- python click
-- csharp system.commandline / dragonfruit (dragonfruit2)
-- node commander
+## For AI Agents
 
-## Future extensions
-
-- Add output format parameter to produce JSON, TOON, or other formats.
+See [AGENTS.md](AGENTS.md) for project rules, file layout, WS protocol reference, and the hand-off checklist.

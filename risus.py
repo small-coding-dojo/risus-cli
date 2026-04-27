@@ -1,55 +1,51 @@
 #!/usr/bin/env python3
-"""Risus CLI - text adventure style battle manager (POC)."""
+"""Risus CLI - multiplayer battle manager."""
 
 import json
 import os
 import sys
+import urllib.request
+
+from client.ws_client import WSClient
+from client.state import PlayerSnapshot
+
+_client: WSClient | None = None
+_display_name: str = ""
 
 
-class Player:
-    def __init__(self, name, cliche="", dice=None):
-        self.name = name
-        self.cliche = cliche
-        self.dice = dice  # None = unknown
-        self.lost_dice = 0  # cumulative losses when dice pool is unknown
-
-
-class Battle:
-    def __init__(self):
-        self.players: list[Player] = []
-
-    def find(self, name: str) -> Player | None:
-        for p in self.players:
-            if p.name.lower() == name.lower():
-                return p
-        return None
+def _ws() -> WSClient:
+    assert _client is not None
+    return _client
 
 
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def show_state(battle: Battle):
+def show_state():
+    state = _ws().state
+    players = state.snapshot_players()
+    presence = state.snapshot_presence()
+    locks = state.snapshot_locks()
+
+    if presence:
+        print(f"Connected: {', '.join(presence)}")
     print("Battle state")
     print("=" * 40)
-    if not battle.players:
+    if not players:
         print("  (no players)")
     else:
         print(f"  {'NAME':<16} {'DICE':>9}  CLICHE")
         print(f"  {'-'*16} {'-'*9}  {'-'*16}")
-        for p in battle.players:
+        for p in players:
             cliche = p.cliche if p.cliche else "(none)"
             if p.dice is None:
                 dice_str = f"? (-{p.lost_dice})" if p.lost_dice else "?"
             else:
                 dice_str = str(p.dice)
-            print(f"  {p.name:<16} {dice_str:>9}  {cliche}")
+            lock_indicator = f" [locked by {locks[p.name]}]" if p.name in locks else ""
+            print(f"  {p.name:<16} {dice_str:>9}  {cliche}{lock_indicator}")
     print()
-
-
-def prompt_name(prompt="Name: ") -> str:
-    val = input(prompt).strip()
-    return val
 
 
 def prompt_int(prompt="Number: ") -> int | None:
@@ -60,139 +56,217 @@ def prompt_int(prompt="Number: ") -> int | None:
         return None
 
 
-def add_player(battle: Battle):
+def _drain_and_wait(msg_types: tuple[str, ...], timeout: float = 5.0) -> dict | None:
+    """Drain inbox, return first frame matching one of msg_types."""
+    ws = _ws()
+    # First drain any buffered frames — apply state updates on the way
+    buffered = ws.drain_inbox()
+    for f in buffered:
+        if f.get("type") in msg_types:
+            return f
+    # Then wait for new frame
+    return ws.recv(timeout=timeout)
+
+
+def _request_lock(player_name: str) -> bool:
+    """Send lock; wait for lock_acquired or lock_denied. Return True if acquired."""
+    ws = _ws()
+    ws.send({"type": "lock", "player_name": player_name})
+    frame = _drain_and_wait(("lock_acquired", "lock_denied", "error"), timeout=3.0)
+    if frame is None:
+        return False
+    ft = frame.get("type")
+    if ft == "lock_acquired" and frame.get("player_name") == player_name:
+        return True
+    if ft == "lock_denied" and frame.get("player_name") == player_name:
+        holder = frame.get("locked_by", "someone")
+        print(f"  [{player_name}] is being edited by [{holder}]")
+        return False
+    return False
+
+
+def _send_and_wait_state(payload: dict, timeout: float = 5.0) -> bool:
+    """Send command; wait for state or error broadcast. Return True on state."""
+    ws = _ws()
+    ws.send(payload)
+    frame = _drain_and_wait(("state", "error"), timeout=timeout)
+    if frame is None:
+        print("  (no response from server)")
+        return False
+    if frame.get("type") == "error":
+        print(f"  Error: {frame.get('message', 'unknown')}")
+        return False
+    return True
+
+
+def _unlock(player_name: str) -> None:
+    _ws().send({"type": "unlock", "player_name": player_name})
+
+
+def connect_or_die() -> None:
+    global _client, _display_name
+    server = input("Server address [localhost:8765]: ").strip() or "localhost:8765"
+    name = input("Your name: ").strip()
+    if not name:
+        print("Name required.")
+        sys.exit(1)
+    _display_name = name
+    _client = WSClient()
+    try:
+        _client.start(server, name, timeout=10.0)
+    except TimeoutError as exc:
+        print(f"  Could not connect: {exc}")
+        sys.exit(1)
+    except Exception as exc:
+        print(f"  Connection failed: {exc}")
+        sys.exit(1)
+    # Drain the initial state frame already buffered
+    _client.drain_inbox()
+
+
+def add_player():
     clear()
-    show_state(battle)
+    show_state()
     print("[ Add Player ]")
-    name = prompt_name("  Player name: ")
+    name = input("  Player name: ").strip()
     if not name:
         print("  Cancelled.")
         input("  Press Enter...")
         return
-    if battle.find(name):
-        print(f"  '{name}' already exists.")
-        input("  Press Enter...")
-        return
     cliche = input("  Starting cliche (leave blank for none): ").strip()
+    dice: int | None = None
     if cliche:
-        dice = prompt_int("  Dice for that cliche (leave blank if unknown): ")
-    else:
-        dice = None
-    battle.players.append(Player(name, cliche, dice))
+        val = input("  Dice for that cliche (leave blank if unknown): ").strip()
+        if val:
+            try:
+                dice = int(val)
+            except ValueError:
+                dice = None
+    _send_and_wait_state({"type": "add_player", "name": name, "cliche": cliche, "dice": dice})
 
 
-def switch_cliche(battle: Battle):
+def switch_cliche():
     clear()
-    show_state(battle)
+    show_state()
     print("[ Switch Cliche ]")
-    if not battle.players:
+    players = _ws().state.snapshot_players()
+    if not players:
         print("  No players.")
         input("  Press Enter...")
         return
-    for i, p in enumerate(battle.players, 1):
+    for i, p in enumerate(players, 1):
         print(f"  {i}. {p.name}")
     choice = prompt_int("  Pick player: ")
-    if choice is None or choice < 1 or choice > len(battle.players):
+    if choice is None or choice < 1 or choice > len(players):
         return
-    player = battle.players[choice - 1]
-    cliche = input(f"  New cliche for {player.name}: ").strip()
-    if not cliche:
+    player = players[choice - 1]
+    if not _request_lock(player.name):
+        input("  Press Enter...")
         return
-    dice = prompt_int("  Dice (leave blank if unknown): ")
-    player.cliche = cliche
-    player.dice = dice
+    try:
+        cliche = input(f"  New cliche for {player.name}: ").strip()
+        if not cliche:
+            return
+        val = input("  Dice (leave blank if unknown): ").strip()
+        dice = int(val) if val else None
+        _send_and_wait_state({"type": "switch_cliche", "player_name": player.name, "cliche": cliche, "dice": dice})
+    finally:
+        _unlock(player.name)
 
 
-def save_battle(battle: Battle):
+def save_battle():
     clear()
-    show_state(battle)
+    show_state()
     print("[ Save Battle ]")
     name = input("  Save name: ").strip()
     if not name:
         print("  Cancelled.")
         input("  Press Enter...")
         return
-    filename = f"{name}.json"
-    data = {
-        "name": name,
-        "players": [
-            {"name": p.name, "cliche": p.cliche, "dice": p.dice, "lost_dice": p.lost_dice}
-            for p in battle.players
-        ],
-    }
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=2)
-    print(f"  Saved to {filename}")
+    _send_and_wait_state({"type": "save", "save_name": name})
+    print(f"  Saved '{name}' on server.")
     input("  Press Enter...")
 
 
-def load_battle(battle: Battle):
+def load_battle():
     clear()
-    show_state(battle)
+    show_state()
     print("[ Load Battle ]")
-    saves = sorted(f for f in os.listdir(".") if f.endswith(".json"))
+    # Fetch save list from REST
+    ws = _ws()
+    server_base = ws._uri.replace("ws://", "http://").rsplit("/ws/", 1)[0]
+    try:
+        with urllib.request.urlopen(f"{server_base}/saves", timeout=5) as resp:
+            saves = json.loads(resp.read())
+    except Exception as exc:
+        print(f"  Could not fetch saves: {exc}")
+        input("  Press Enter...")
+        return
     if not saves:
         print("  No save files found.")
         input("  Press Enter...")
         return
-    for i, f in enumerate(saves, 1):
-        print(f"  {i}. {f[:-5]}")
+    for i, s in enumerate(saves, 1):
+        print(f"  {i}. {s['save_name']}")
     choice = prompt_int("  Pick save: ")
     if choice is None or choice < 1 or choice > len(saves):
         return
-    filename = saves[choice - 1]
-    with open(filename) as f:
-        data = json.load(f)
-    battle.players = [
-        Player(p["name"], p.get("cliche", ""), p.get("dice"), )
-        for p in data.get("players", [])
-    ]
-    for p, pd in zip(battle.players, data.get("players", [])):
-        p.lost_dice = pd.get("lost_dice", 0)
-    print(f"  Loaded {filename}")
+    save_name = saves[choice - 1]["save_name"]
+    _send_and_wait_state({"type": "load", "save_name": save_name})
+    print(f"  Loaded '{save_name}' from server.")
     input("  Press Enter...")
 
 
-def reduce_dice(battle: Battle):
+def reduce_dice():
     clear()
-    show_state(battle)
+    show_state()
     print("[ Reduce Dice ]")
-    if not battle.players:
+    players = _ws().state.snapshot_players()
+    if not players:
         print("  No players.")
         input("  Press Enter...")
         return
-    for i, p in enumerate(battle.players, 1):
+    for i, p in enumerate(players, 1):
         if p.dice is None:
             dice_str = f"? (-{p.lost_dice})" if p.lost_dice else "?"
         else:
             dice_str = str(p.dice)
         print(f"  {i}. {p.name}  ({dice_str} dice)")
     choice = prompt_int("  Pick player: ")
-    if choice is None or choice < 1 or choice > len(battle.players):
+    if choice is None or choice < 1 or choice > len(players):
         return
-    player = battle.players[choice - 1]
-    if player.dice is None:
-        amount = prompt_int("  How many dice lost: ")
-        if amount and amount > 0:
-            player.lost_dice += amount
-        dead = input(f"  Is {player.name} dead? [y/n]: ").strip().lower()
-        if dead == "y":
-            battle.players.remove(player)
+    player = players[choice - 1]
+    if not _request_lock(player.name):
+        input("  Press Enter...")
         return
-    amount = prompt_int(f"  Reduce by how many dice (current: {player.dice}): ")
-    if amount is None:
-        return
-    player.dice = max(0, player.dice - amount)
-    if player.dice == 0:
-        battle.players.remove(player)
+    try:
+        is_dead = False
+        if player.dice is None:
+            amount_str = input("  How many dice lost: ").strip()
+            amount = int(amount_str) if amount_str else 0
+            dead = input(f"  Is {player.name} dead? [y/n]: ").strip().lower()
+            is_dead = dead == "y"
+        else:
+            amount_str = input(f"  Reduce by how many dice (current: {player.dice}): ").strip()
+            if not amount_str:
+                return
+            amount = int(amount_str)
+        _send_and_wait_state({
+            "type": "reduce_dice",
+            "player_name": player.name,
+            "amount": amount,
+            "is_dead": is_dead,
+        })
+    finally:
+        _unlock(player.name)
 
 
 def main():
-    battle = Battle()
+    connect_or_die()
 
     while True:
         clear()
-        show_state(battle)
+        show_state()
         print("  1. Add player")
         print("  2. Switch cliche")
         print("  3. Reduce dice")
@@ -203,17 +277,23 @@ def main():
         choice = input("> ").strip()
 
         if choice == "1":
-            add_player(battle)
+            add_player()
         elif choice == "2":
-            switch_cliche(battle)
+            switch_cliche()
         elif choice == "3":
-            reduce_dice(battle)
+            reduce_dice()
         elif choice == "4":
-            save_battle(battle)
+            save_battle()
         elif choice == "5":
-            load_battle(battle)
+            load_battle()
         elif choice == "6":
             sys.exit(0)
+
+        # Flush any incoming frames before next redraw
+        frames = _ws().drain_inbox()
+        for f in frames:
+            if f.get("type") == "disconnected":
+                print("  Connection lost. Reconnecting...")
 
 
 if __name__ == "__main__":

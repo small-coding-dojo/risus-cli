@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risus-cli"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.29",
+    "websockets>=12",
+    "asyncpg>=0.29",
+    "pydantic>=2",
+]
+client = [
+    "websockets>=12",
+]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+    "pytest-docker>=3",
+    "freezegun>=1.4",
+    "anyio[trio]>=4",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["server*", "client*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "e2e: end-to-end tests that spin up real Docker containers",
+]
+testpaths = ["tests"]
