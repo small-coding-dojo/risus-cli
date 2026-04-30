@@ -14,11 +14,12 @@ venv/
 env/
 .env
 
-# OMC (oh-my-claudecode) - ephemeral state, keep memory/config
-.omc/state/
-.omc/sessions/
-.omc/logs/
-.omc/notepad.md
+# Oh My Claude Code state - block all, then carve out what to share
+!.omc/
+.omc/*
+!.omc/skills/
+!.omc/skills/**
+!.omc/project-memory.json
 
 # Battle save files (generated at runtime)
 Current-Battle.json
