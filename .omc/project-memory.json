@@ -1,17 +1,37 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1776697462822,
+  "lastScanned": 1777491472649,
   "projectRoot": "/home/galadriel/Documents/Cline/risus-cli",
   "techStack": {
-    "languages": [],
-    "frameworks": [],
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "fastapi",
+        "version": null,
+        "category": "backend"
+      },
+      {
+        "name": "pytest",
+        "version": null,
+        "category": "testing"
+      }
+    ],
     "packageManager": null,
     "runtime": null
   },
   "build": {
     "buildCommand": null,
-    "testCommand": null,
-    "lintCommand": null,
+    "testCommand": "pytest",
+    "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
   },
@@ -24,14 +44,59 @@
   "structure": {
     "isMonorepo": false,
     "workspaces": [],
-    "mainDirectories": [],
+    "mainDirectories": [
+      "tests"
+    ],
     "gitBranches": {
       "defaultBranch": "main",
       "branchingStrategy": null
     }
   },
   "customNotes": [],
-  "directoryMap": {},
+  "directoryMap": {
+    "client": {
+      "path": "client",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1777491472639,
+      "keyFiles": [
+        "__init__.py",
+        "state.py",
+        "ws_client.py"
+      ]
+    },
+    "docker": {
+      "path": "docker",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1777491472646,
+      "keyFiles": [
+        "server.Dockerfile"
+      ]
+    },
+    "server": {
+      "path": "server",
+      "purpose": null,
+      "fileCount": 9,
+      "lastAccessed": 1777491472646,
+      "keyFiles": [
+        "__init__.py",
+        "app.py",
+        "commands.py",
+        "db.py",
+        "locks.py"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 1,
+      "lastAccessed": 1777491472647,
+      "keyFiles": [
+        "__init__.py"
+      ]
+    }
+  },
   "hotPaths": [
     {
       "path": "risus.py",
