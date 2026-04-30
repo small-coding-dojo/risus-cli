@@ -33,6 +33,10 @@ risus.py (CLI)  ◄── WebSocket ──►  risus-server (FastAPI)  ◄──
 - `Postgres`: stores players, locks (audit), and named saves
 - `risus.py`: thin WS client; all state comes from server broadcasts
 
+## Features
+
+Specifications and design for features are stored in [docs/features](./docs/features).
+
 ## For AI Agents
 
 See [AGENTS.md](AGENTS.md) for project rules, file layout, WS protocol reference, and the hand-off checklist.
