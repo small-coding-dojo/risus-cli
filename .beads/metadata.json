@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "risus_cli",
+  "project_id": "2f5256f8-04bd-4c00-a62c-912a86b1cd51"
+}
