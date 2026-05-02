@@ -18,9 +18,6 @@ jobs:
           - os: ubuntu-latest
             artifact: risus-linux-x86_64
             binary: dist/risus
-          - os: macos-13
-            artifact: risus-macos-x86_64
-            binary: dist/risus
           - os: macos-latest
             artifact: risus-macos-arm64
             binary: dist/risus

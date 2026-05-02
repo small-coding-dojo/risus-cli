@@ -10,8 +10,7 @@ operating system:
 | Your OS               | File to download                |
 |-----------------------|---------------------------------|
 | Windows               | `risus-windows-x86_64.exe`      |
-| macOS (Apple Silicon) | `risus-macos-arm64`             |
-| macOS (Intel)         | `risus-macos-x86_64`            |
+| macOS                 | `risus-macos-arm64`             |
 | Linux                 | `risus-linux-x86_64`            |
 
 ## 2. Make it executable (macOS / Linux only)
