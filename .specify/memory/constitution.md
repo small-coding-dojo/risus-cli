@@ -41,8 +41,8 @@ change. `input()` calls MUST remain synchronous; no `prompt_toolkit` or async
 input libraries may be introduced.
 
 **Rationale**: Scope creep breaks the PRD contract and multi-player UX
-assumptions. From clean-code rules: keep modifications, configuration, and
-options at the absolute minimum to achieve the current goal.
+assumptions. Keep modifications, configuration, and options at the absolute
+minimum to achieve the current goal.
 
 ### III. No Duplication
 

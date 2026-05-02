@@ -1,18 +1,46 @@
 # AGENTS.md — AI Agent Rules for Risus CLI
 
-This file is self-contained. A fresh clone plus this file is enough context to continue the project.
+This file is the runtime companion to `.specify/memory/constitution.md`.
+The constitution is ground truth for principles, tech stack, workflow, and
+quality gates; this file covers operational detail not appropriate for the
+constitution.
+
+A fresh clone plus the constitution plus this file is enough context to
+continue the project.
+
+---
+
+## Collaboration with the User
+
+- **Language**: chat is in English.
+- **One question at a time**: when asking the user a question, ask one
+  question at a time so they can focus.
+- **Avoid ambiguity**: if instructions are unclear, contradictory, or
+  conflict with rules or earlier instructions, describe the situation and
+  ask clarifying questions before proceeding.
+- **Custom instructions**: when the user says "follow your custom
+  instructions", use the `/memory-bank-by-cline` skill to understand the
+  memory bank concept. If no memory bank exists, ask for clarification.
+  Otherwise read the memory bank, identify the next action, read the
+  applicable rules, summarize understanding ending with the next immediate
+  action, then ask whether to execute it.
+- **Hidden files**: the LS tool does not show hidden files; use
+  `ls -la <path>` via Bash to check for hidden files or directories.
 
 ---
 
 ## Project at a Glance
 
-Risus CLI is a multiplayer battle tracker for the Risus RPG system. Multiple CLI clients connect to a shared FastAPI server backed by Postgres. All battle state is server-authoritative; the CLI is a thin renderer. Locks coordinate concurrent edits to the same player.
+Risus CLI is a multiplayer battle tracker for the Risus RPG system. Multiple
+CLI clients connect to a shared FastAPI server backed by Postgres. All battle
+state is server-authoritative; the CLI is a thin renderer. Locks coordinate
+concurrent edits to the same player.
 
 ---
 
 ## Where Things Live
 
-```
+```text
 risus.py              CLI entry point — thin client over WebSocket
 client/
   ws_client.py        asyncio WS client; background thread + two queues
@@ -40,43 +68,35 @@ AGENTS.md             This file
 
 ## Definition of Done
 
-A change is ready for review when ALL of the following pass on a clean clone:
+The constitution defines the automated quality gate. In addition, run the
+manual smoke checklist on a clean clone:
 
-```bash
-pytest tests/unit -q
-CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q
-podman-compose up -d && curl -fsS http://localhost:8765/healthz
-```
-
-Plus the manual smoke checklist:
 - `python risus.py` shows startup prompts and connects
-- Two terminals running `python risus.py` see the same state and `Connected:` line
-- One client locks a player; the other sees the lock indicator and gets `lock_denied`
+- Two terminals running `python risus.py` see the same state and
+  `Connected:` line
+- One client locks a player; the other sees the lock indicator and gets
+  `lock_denied`
 - `podman-compose restart server` preserves player state; clients reconnect
 - Dropping a client (`Ctrl+C`) frees its locks within ~30 s
 
 ---
 
-## Hard Rules
+## Operational Rules
 
-1. **Server is the only source of truth.** Never mutate `ClientState` locally and hope the server agrees. All mutations go through WS commands.
-2. **Preserve menu UX.** Options 1–6 labels, prompts, and ordering must not change. The `input()` calls must stay synchronous (no `prompt_toolkit`).
-3. **No local JSON file I/O.** Save/load are server-side operations only.
-4. **Lock enforcement is server-side.** `switch_cliche` and `reduce_dice` handlers verify `LockManager.holder(player_name) == caller_client_id` and return an `error` frame on violation. Locks are never decorative.
-5. **One lock store.** `LockManager` (in-memory) is authoritative. The `locks` DB table is an audit log, truncated on server startup. Locks do NOT survive server restart.
-6. **Docker and Podman are equal peers.** Every command in docs appears for both runtimes. No "or Podman" footnotes.
-7. **No auth, no multiple battles.** Out of scope per PRD. Do not add authentication or multi-battle support.
+The constitution defines the non-negotiable principles (server authority,
+simplicity, no duplication, testing discipline, no local persistence). The
+items below are the operational specifics that implement those principles:
 
----
+1. **Lock-holder check**: `switch_cliche` and `reduce_dice` handlers verify
+   `LockManager.holder(player_name) == caller_client_id` and return an
+   `error` frame on violation. Locks are never decorative.
+2. **One lock store**: `LockManager` (in-memory) is authoritative. The
+   `locks` DB table is an audit log, truncated on server startup. Locks do
+   NOT survive server restart.
+3. **Error frame shape**: `{"type": "error", "message": "<string>"}`.
 
-## Workflow
-
-1. Branch from `main`: `git checkout -b feat/my-change`
-2. Make changes
-3. Run unit tests: `pytest tests/unit -q`
-4. Start stack and run e2e: `podman-compose up -d && CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q`
-5. Commit with Conventional Commits format: `feat: add X`, `fix: Y`, `test: cover Z`
-6. Open PR
+For workflow steps and Conventional Commits formatting, see the
+constitution's "Development Workflow" section.
 
 ---
 
@@ -85,7 +105,7 @@ Plus the manual smoke checklist:
 ### Client → Server
 
 | type | key fields | lock required? |
-|---|---|---|
+| --- | --- | --- |
 | `add_player` | `name, cliche, dice` | No |
 | `switch_cliche` | `player_name, cliche, dice` | Yes |
 | `reduce_dice` | `player_name, amount, is_dead` | Yes |
@@ -97,7 +117,7 @@ Plus the manual smoke checklist:
 ### Server → Client (broadcast unless noted)
 
 | type | key fields | notes |
-|---|---|---|
+| --- | --- | --- |
 | `state` | `players: [{name, cliche, dice, lost_dice}]` | Full sync |
 | `presence` | `clients: [names]` | Connected users |
 | `lock_acquired` | `player_name, locked_by` | Broadcast |
@@ -105,14 +125,12 @@ Plus the manual smoke checklist:
 | `lock_denied` | `player_name, locked_by` | Caller only |
 | `error` | `message` | Caller only |
 
-Error frame shape: `{"type": "error", "message": "<string>"}`
-
 ---
 
 ## PRD Acceptance Criteria → Tests
 
 | AC | Criterion | Test |
-|---|---|---|
+| --- | --- | --- |
 | AC1 | Two clients see state within 1 s | `e2e::test_state_propagates_within_one_second` |
 | AC2 | Lock blocks concurrent edit | `e2e::test_lock_blocks_concurrent_edit` + `unit::test_switch_cliche_rejects_without_lock` |
 | AC3 | State survives server restart | `e2e::test_state_survives_server_restart` |
@@ -125,15 +143,18 @@ Error frame shape: `{"type": "error", "message": "<string>"}`
 ## Hand-Off Checklist (for PR description)
 
 - [ ] `pytest tests/unit -q` — all passing, count reported
-- [ ] `CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q` — all passing, count reported
-- [ ] `podman-compose up -d && curl -fsS http://localhost:8765/healthz` — returns `{"ok":true}`
+- [ ] `CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q` — all passing,
+      count reported
+- [ ] `podman-compose up -d && curl -fsS http://localhost:8765/healthz` —
+      returns `{"ok":true}`
 - [ ] Each AC above maps to a named passing test
 - [ ] `CONTRIBUTING.md` and `AGENTS.md` updated if any new setup step was added
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
 
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
+This project uses **bd (beads)** for issue tracking. Run `bd prime` to see
+full workflow context and commands.
 
 ### Quick Reference
 
@@ -146,31 +167,37 @@ bd close <id>         # Complete work
 
 ### Rules
 
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
+- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or
+  markdown TODO lists
 - Run `bd prime` for detailed command reference and session close protocol
 - Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
 
 ## Session Completion
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+**When ending a work session**, you MUST complete ALL steps below. Work is NOT
+complete until `git push` succeeds.
 
 **MANDATORY WORKFLOW:**
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
+1. **File issues for remaining work** - Create issues for anything that needs
+   follow-up
 2. **Run quality gates** (if code changed) - Tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
+
    ```bash
    git pull --rebase
    bd dolt push
    git push
    git status  # MUST show "up to date with origin"
    ```
+
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
 7. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
+
 - Work is NOT complete until `git push` succeeds
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
