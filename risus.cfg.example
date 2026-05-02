@@ -1,0 +1,6 @@
+[risus]
+# Default server address (host:port). Updated automatically on exit.
+# Copy this file to risus.cfg to set initial defaults.
+server = localhost:8765
+# Default display name. Updated automatically on exit.
+# name = YourName

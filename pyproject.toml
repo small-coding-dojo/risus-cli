@@ -26,6 +26,7 @@ dev = [
     "pytest-docker>=3",
     "freezegun>=1.4",
     "anyio[trio]>=4",
+    "pyinstaller>=6",
 ]
 
 [tool.setuptools.packages.find]
