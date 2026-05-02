@@ -113,9 +113,21 @@
       "type": "file"
     },
     {
+      "path": "AGENTS.md",
+      "accessCount": 17,
+      "lastAccessed": 1777740023043,
+      "type": "file"
+    },
+    {
       "path": ".specify/memory/constitution.md",
+      "accessCount": 8,
+      "lastAccessed": 1777739931268,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
       "accessCount": 4,
-      "lastAccessed": 1777739245280,
+      "lastAccessed": 1777739947974,
       "type": "file"
     },
     {
@@ -128,12 +140,6 @@
       "path": ".specify/templates/constitution-template.md",
       "accessCount": 1,
       "lastAccessed": 1777738982727,
-      "type": "file"
-    },
-    {
-      "path": "AGENTS.md",
-      "accessCount": 1,
-      "lastAccessed": 1777738983108,
       "type": "file"
     },
     {
@@ -158,6 +164,12 @@
       "path": "CONTRIBUTING.md",
       "accessCount": 1,
       "lastAccessed": 1777738990586,
+      "type": "file"
+    },
+    {
+      "path": ".markdownlint.json",
+      "accessCount": 1,
+      "lastAccessed": 1777739996733,
       "type": "file"
     }
   ],
