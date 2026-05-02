@@ -74,12 +74,15 @@ quit, relaunch and confirm prompts pre-fill saved values.
 
 - [ ] T007 [US1] Update `risus.py` — replace positional `sys.argv` access
   with `argparse` parsing: optional positional args `server` (default None)
-  and `name` (default None). After parsing, call `client.config.read_config`
-  with `Path(__file__).parent` to load defaults. Prompt for any missing arg
-  per `specs/003-standalone-client/contracts/interactive-prompt.md`: server
-  prompt shows `[default]` when available, re-prompts on empty input; same
-  for name. Register `atexit` handler calling `client.config.write_config`
-  with the resolved server and name.
+  and `name` (default None). Resolve config base dir with frozen-binary
+  detection: `base_dir = Path(sys.executable).parent if getattr(sys,
+  'frozen', False) else Path(__file__).parent` (in PyInstaller `--onefile`
+  mode `__file__` is the temp extraction dir, not the binary dir). Call
+  `client.config.read_config(base_dir)` to load defaults. Prompt for any
+  missing arg per `specs/003-standalone-client/contracts/interactive-prompt.md`:
+  server prompt shows `[default]` when available, re-prompts on empty input;
+  same for name. Register `atexit` handler calling
+  `client.config.write_config(base_dir, server, name)`.
 - [ ] T008 [P] [US1] Unit tests for startup prompt logic in
   `tests/unit/test_startup.py`: no args + no config → both prompts shown
   blank; no args + config with both values → prompts show defaults; server
@@ -126,8 +129,8 @@ GitHub Release.
   artifact per `specs/003-standalone-client/contracts/artifact-naming.md`
   (e.g. `risus-linux-x86_64`); compute `sha256sum` and write
   `{artifact}.sha256`; create GitHub Release via `gh release create` or
-  `softprops/action-gh-release`; upload all binaries and checksum files as
-  release assets.
+  `softprops/action-gh-release`; upload all binaries, checksum files, and
+  `risus.cfg.example` as release assets.
 - [ ] T013 [US2] Write complete developer build instructions in
   `build/README.md`: prerequisites, `pip install pyinstaller`, build
   command, expected output path, clean command, CI context. Per
@@ -172,10 +175,13 @@ no Python knowledge to connect — US3 independently complete.
   after a local build (gitignore correct per T001)
 - [ ] T017 Run `pytest tests/unit -q` and confirm all new tests pass
   (T006, T008)
-- [ ] T018 Run end-to-end smoke test: build binary, copy to temp dir (no
-  Python in PATH), run with `--help` or valid server args, confirm no
-  traceback on clean exit
-- [ ] T019 [P] Run `ruff check` on `risus.py` and `client/config.py`; fix
+- [ ] T018 Run `CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q` against
+  the updated `risus.py` source to confirm existing WS protocol behaviour
+  is unbroken by startup changes. Satisfies constitution § IV and SC-003.
+- [ ] T019 Run end-to-end smoke test: build binary, copy to temp dir (no
+  Python in PATH), run with valid server args, confirm no traceback on clean
+  exit and `risus.cfg` written next to binary
+- [ ] T020 [P] Run `ruff check` on `risus.py` and `client/config.py`; fix
   any lint errors
 
 ---
@@ -194,7 +200,7 @@ no Python knowledge to connect — US3 independently complete.
   parallel with Phase 3 polish
 - **US3 (Phase 5)**: Independent of US1/US2 content — can start after
   Phase 1; T015 parallel with T014
-- **Polish (Phase 6)**: Requires Phase 3 complete for T017/T018
+- **Polish (Phase 6)**: Requires Phase 3 complete for T017/T018/T019
 
 ### User Story Dependencies
 

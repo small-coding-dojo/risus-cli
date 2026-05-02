@@ -6,8 +6,8 @@
 
 ### ConfigFile
 
-Read by `client/config.py` at startup. Not written by the application;
-players edit it manually.
+Read at startup and written on normal exit by `client/config.py`. Players
+may also edit it manually between sessions.
 
 | Field          | Type           | Description                                      |
 |----------------|----------------|--------------------------------------------------|

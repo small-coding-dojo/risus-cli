@@ -86,8 +86,8 @@ distribution patterns (kubectl, gh, golangci-lint).
 
 **Decision**: `risus.py` checks `sys.argv`. If server address or display
 name are missing, print prompts via `input()` (synchronous, per
-constitution). Config file default pre-fills the server address prompt.
-Display name has no default.
+constitution). Both prompts pre-fill defaults from the config file when
+values are present (`server` key for address, `name` key for display name).
 **Rationale**: `input()` is already used throughout the CLI (constitution
 mandates synchronous input). Extending startup to use `input()` is the
 zero-friction path.
