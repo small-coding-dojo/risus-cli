@@ -143,8 +143,8 @@ constitution's "Development Workflow" section.
 ## Hand-Off Checklist (for PR description)
 
 - [ ] `pytest tests/unit -q` — all passing, count reported
-- [ ] `CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q` — all passing,
-      count reported
+- [ ] `PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q` — all passing,
+      count reported (`podman-compose` installs to `.venv/bin/`, not system PATH)
 - [ ] `podman-compose up -d && curl -fsS http://localhost:8765/healthz` —
       returns `{"ok":true}`
 - [ ] Each AC above maps to a named passing test
