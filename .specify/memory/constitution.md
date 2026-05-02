@@ -1,50 +1,129 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: [CONSTITUTION_VERSION] → 1.0.0
+Modified principles: None (initial population — all placeholders replaced)
+Added sections: Core Principles (5), Tech Stack & Constraints,
+  Development Workflow, Governance
+Removed sections: N/A
+Templates requiring updates:
+  - .specify/templates/plan-template.md ✅
+    (Constitution Check gates align with principles below)
+  - .specify/templates/spec-template.md ✅
+    (no changes required; scope constraints consistent)
+  - .specify/templates/tasks-template.md ✅
+    (no changes required; testing discipline reflected)
+Follow-up TODOs: None — all placeholders resolved
+-->
+
+# Risus CLI Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Server Authority (NON-NEGOTIABLE)
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+The server is the single source of truth for all battle state. `ClientState`
+MUST NOT be mutated locally and assumed correct. All mutations MUST flow
+through WebSocket commands to the server. Lock enforcement MUST be
+server-side; `LockManager` is the sole arbiter of which client holds a lock.
+The `locks` DB table is an audit log only and MUST NOT be used to reconstruct
+lock state.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: Concurrency correctness requires one authoritative source.
+Local mutations create divergent state that silently corrupts multi-player
+sessions.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Simplicity (NON-NEGOTIABLE)
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+Every change MUST achieve its goal with the minimum viable scope. No
+authentication, no multi-battle support — these are permanently out of scope
+per the PRD. Menu UX (options 1–6, labels, prompts, ordering) MUST NOT
+change. `input()` calls MUST remain synchronous; no `prompt_toolkit` or async
+input libraries may be introduced.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Scope creep breaks the PRD contract and multi-player UX
+assumptions. From clean-code rules: keep modifications, configuration, and
+options at the absolute minimum to achieve the current goal.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. No Duplication
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Code and documentation MUST NOT duplicate logic or content. When logic appears
+in two places, extract it. When docs repeat information, link instead.
+Duplication in tests is permitted where it aids clarity and isolation.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: Duplication makes maintenance expensive and creates drift
+between sources of truth.
+
+### IV. Testing Discipline
+
+Changes MUST pass unit tests (`pytest tests/unit -q`) and E2E tests
+(`CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q`) on a clean clone
+before review. E2E tests MUST target a real container stack — mocking the
+container layer in E2E scenarios is prohibited. Both Docker and Podman MUST
+remain equal peers in all docs and test instructions.
+
+**Rationale**: The WS protocol and DB interactions require real-stack
+verification. Mock-only coverage allows contract drift to reach production
+undetected.
+
+### V. No Local Persistence
+
+The CLI MUST NOT perform local JSON or file I/O for battle state. Save/load
+are server-side operations only. No feature may introduce local state storage
+without an explicit constitution amendment.
+
+**Rationale**: Keeping the CLI a thin renderer preserves server authority and
+eliminates a class of local-vs-server state divergence bugs.
+
+## Tech Stack & Constraints
+
+- **Language**: Python 3.12+
+- **Server**: FastAPI + asyncpg + Postgres 16; WS at `/ws/{name}`;
+  REST at `/state`, `/saves`, `/healthz`
+- **Client**: asyncio WS client (`client/ws_client.py`);
+  blocking `input()` loop in `risus.py`
+- **Testing**: pytest 8+; unit (no containers), E2E (real stack via compose)
+- **Container runtimes**: Docker Compose and podman-compose — both MUST work
+- **Commits**: Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`,
+  `chore:`)
+- **Linting**: ruff check; formatting: black (or equivalent)
+- **Out of scope**: authentication, multi-battle support, local file
+  persistence
+
+## Development Workflow
+
+1. Branch from `main`: `git checkout -b feat/my-change`
+2. Make changes; unit tests MUST pass locally before committing
+3. E2E tests MUST pass against real stack before opening a PR
+4. Commit using Conventional Commits
+5. Open PR with the AGENTS.md hand-off checklist completed
+
+**Quality Gate** (required before any PR merges):
+
+```bash
+pytest tests/unit -q
+CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q
+podman-compose up -d && curl -fsS http://localhost:8765/healthz
+```
+
+Changes to the WS protocol MUST update the WS Protocol Reference table in
+`AGENTS.md`. Schema changes MUST update `server/schema.sql` and require
+`docker compose down -v` on existing volumes.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other guidance when conflicts arise.
+Amendments require:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+1. A description of the change and its rationale.
+2. A version bump per semantic versioning:
+   - MAJOR: principle removal or redefinition
+   - MINOR: new principle or section added
+   - PATCH: clarification, wording, or non-semantic refinement
+3. A propagation check across `.specify/templates/` and `AGENTS.md`.
+
+All PRs and code reviews MUST verify compliance with Core Principles.
+Complexity additions MUST be justified in the plan's Complexity Tracking
+table. Refer to `AGENTS.md` for runtime agent guidance and the hand-off
+checklist.
+
+**Version**: 1.0.0 | **Ratified**: 2026-05-02 | **Last Amended**: 2026-05-02

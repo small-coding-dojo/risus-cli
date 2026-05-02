@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1777491472649,
+  "lastScanned": 1777717447896,
   "projectRoot": "/home/galadriel/Documents/Cline/risus-cli",
   "techStack": {
     "languages": [
@@ -45,6 +45,7 @@
     "isMonorepo": false,
     "workspaces": [],
     "mainDirectories": [
+      "docs",
       "tests"
     ],
     "gitBranches": {
@@ -58,7 +59,7 @@
       "path": "client",
       "purpose": null,
       "fileCount": 3,
-      "lastAccessed": 1777491472639,
+      "lastAccessed": 1777717447887,
       "keyFiles": [
         "__init__.py",
         "state.py",
@@ -69,16 +70,23 @@
       "path": "docker",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1777491472646,
+      "lastAccessed": 1777717447890,
       "keyFiles": [
         "server.Dockerfile"
       ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 0,
+      "lastAccessed": 1777717447891,
+      "keyFiles": []
     },
     "server": {
       "path": "server",
       "purpose": null,
       "fileCount": 9,
-      "lastAccessed": 1777491472646,
+      "lastAccessed": 1777717447892,
       "keyFiles": [
         "__init__.py",
         "app.py",
@@ -91,7 +99,7 @@
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 1,
-      "lastAccessed": 1777491472647,
+      "lastAccessed": 1777717447893,
       "keyFiles": [
         "__init__.py"
       ]
@@ -105,10 +113,52 @@
       "type": "file"
     },
     {
+      "path": ".specify/memory/constitution.md",
+      "accessCount": 4,
+      "lastAccessed": 1777739245280,
+      "type": "file"
+    },
+    {
       "path": "",
       "accessCount": 1,
       "lastAccessed": 1776702156268,
       "type": "directory"
+    },
+    {
+      "path": ".specify/templates/constitution-template.md",
+      "accessCount": 1,
+      "lastAccessed": 1777738982727,
+      "type": "file"
+    },
+    {
+      "path": "AGENTS.md",
+      "accessCount": 1,
+      "lastAccessed": 1777738983108,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/plan-template.md",
+      "accessCount": 1,
+      "lastAccessed": 1777738988998,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/spec-template.md",
+      "accessCount": 1,
+      "lastAccessed": 1777738989790,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/tasks-template.md",
+      "accessCount": 1,
+      "lastAccessed": 1777738990230,
+      "type": "file"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "accessCount": 1,
+      "lastAccessed": 1777738990586,
+      "type": "file"
     }
   ],
   "userDirectives": []
