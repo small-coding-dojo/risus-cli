@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Risus CLI - multiplayer battle manager."""
 
+import argparse
+import atexit
 import json
 import os
 import sys
 import urllib.request
+from pathlib import Path
 
+import client.config
 from client.ws_client import WSClient
-from client.state import PlayerSnapshot
 
 _client: WSClient | None = None
-_display_name: str = ""
 
 
 def _ws() -> WSClient:
@@ -59,12 +61,10 @@ def prompt_int(prompt="Number: ") -> int | None:
 def _drain_and_wait(msg_types: tuple[str, ...], timeout: float = 5.0) -> dict | None:
     """Drain inbox, return first frame matching one of msg_types."""
     ws = _ws()
-    # First drain any buffered frames — apply state updates on the way
     buffered = ws.drain_inbox()
     for f in buffered:
         if f.get("type") in msg_types:
             return f
-    # Then wait for new frame
     return ws.recv(timeout=timeout)
 
 
@@ -103,24 +103,28 @@ def _unlock(player_name: str) -> None:
     _ws().send({"type": "unlock", "player_name": player_name})
 
 
-def connect_or_die() -> None:
-    global _client, _display_name
-    server = input("Server address [localhost:8765]: ").strip() or "localhost:8765"
-    name = input("Your name: ").strip()
-    if not name:
-        print("Name required.")
-        sys.exit(1)
-    _display_name = name
+def _prompt_required(label: str, default: str | None) -> str:
+    """Prompt until non-empty input; accept default on empty when default present."""
+    while True:
+        hint = f" [{default}]" if default else ""
+        val = input(f"{label}{hint}: ").strip()
+        if val:
+            return val
+        if default:
+            return default
+
+
+def connect_or_die(server: str, name: str) -> None:
+    global _client
     _client = WSClient()
     try:
         _client.start(server, name, timeout=10.0)
-    except TimeoutError as exc:
-        print(f"  Could not connect: {exc}")
+    except TimeoutError:
+        print(f"Cannot reach server at {server}. Check address and try again.")
         sys.exit(1)
     except Exception as exc:
         print(f"  Connection failed: {exc}")
         sys.exit(1)
-    # Drain the initial state frame already buffered
     _client.drain_inbox()
 
 
@@ -262,7 +266,21 @@ def reduce_dice():
 
 
 def main():
-    connect_or_die()
+    base_dir = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).parent
+
+    parser = argparse.ArgumentParser(description="Risus battle manager")
+    parser.add_argument("server", nargs="?", default=None, help="Server address (host:port)")
+    parser.add_argument("name", nargs="?", default=None, help="Display name")
+    args = parser.parse_args()
+
+    saved_server, saved_name = client.config.read_config(base_dir)
+
+    server = args.server or _prompt_required("Server address", saved_server)
+    name = args.name or _prompt_required("Your name", saved_name)
+
+    atexit.register(client.config.write_config, base_dir, server, name)
+
+    connect_or_die(server, name)
 
     while True:
         clear()
@@ -289,7 +307,6 @@ def main():
         elif choice == "6":
             sys.exit(0)
 
-        # Flush any incoming frames before next redraw
         frames = _ws().drain_inbox()
         for f in frames:
             if f.get("type") == "disconnected":

@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches: [main, 003-standalone-client]
+  pull_request:
+    branches: [main, 003-standalone-client]
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[client]" pyinstaller>=6
+
+      - name: Build binary
+        run: python -m PyInstaller build/risus.spec
+
+      - name: Verify binary exists and is non-empty (Unix)
+        if: runner.os != 'Windows'
+        run: test -s dist/risus
+
+      - name: Verify binary exists and is non-empty (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $f = Get-Item dist\risus.exe -ErrorAction Stop
+          if ($f.Length -eq 0) { exit 1 }
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: risus-${{ matrix.os }}
+          path: dist/risus*

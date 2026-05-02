@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": "pytest",
+    "testCommand": "bd remember \"podman-compose is in .venv/bin/ (not system PATH). E2e tests need PATH=\\$PWD/.venv/bin:\\$PATH prepended when CONTAINER_ENGINE=podman, because podman compose looks for podman-compose as external provider. Use: PATH=\\$PWD/.venv/bin:\\$PATH CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q\" 2>&1",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -108,26 +108,140 @@
   "hotPaths": [
     {
       "path": "risus.py",
-      "accessCount": 19,
-      "lastAccessed": 1776701717408,
+      "accessCount": 29,
+      "lastAccessed": 1777751079617,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/spec.md",
+      "accessCount": 20,
+      "lastAccessed": 1777749597169,
       "type": "file"
     },
     {
       "path": "AGENTS.md",
-      "accessCount": 17,
-      "lastAccessed": 1777740023043,
+      "accessCount": 19,
+      "lastAccessed": 1777755049730,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/research.md",
+      "accessCount": 15,
+      "lastAccessed": 1777748689762,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/plan.md",
+      "accessCount": 13,
+      "lastAccessed": 1777750552764,
       "type": "file"
     },
     {
       "path": ".specify/memory/constitution.md",
+      "accessCount": 11,
+      "lastAccessed": 1777750552686,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/tasks.md",
+      "accessCount": 10,
+      "lastAccessed": 1777749596432,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/contracts/config-file.md",
+      "accessCount": 10,
+      "lastAccessed": 1777749610191,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/data-model.md",
+      "accessCount": 9,
+      "lastAccessed": 1777748689564,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/quickstart.md",
+      "accessCount": 9,
+      "lastAccessed": 1777749902416,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 9,
+      "lastAccessed": 1777754918429,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/contracts/interactive-prompt.md",
       "accessCount": 8,
-      "lastAccessed": 1777739931268,
+      "lastAccessed": 1777749610999,
       "type": "file"
     },
     {
       "path": "CLAUDE.md",
-      "accessCount": 4,
-      "lastAccessed": 1777739947974,
+      "accessCount": 7,
+      "lastAccessed": 1777747241131,
+      "type": "file"
+    },
+    {
+      "path": "tests/unit/test_startup.py",
+      "accessCount": 6,
+      "lastAccessed": 1777751095283,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/checklists/requirements.md",
+      "accessCount": 3,
+      "lastAccessed": 1777744903324,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 3,
+      "lastAccessed": 1777750534618,
+      "type": "file"
+    },
+    {
+      "path": "client/config.py",
+      "accessCount": 3,
+      "lastAccessed": 1777751032100,
+      "type": "file"
+    },
+    {
+      "path": "PLAYER.md",
+      "accessCount": 3,
+      "lastAccessed": 1777755254097,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/spec-template.md",
+      "accessCount": 2,
+      "lastAccessed": 1777744442610,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/tasks-template.md",
+      "accessCount": 2,
+      "lastAccessed": 1777747415692,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/contracts/artifact-naming.md",
+      "accessCount": 2,
+      "lastAccessed": 1777749611630,
+      "type": "file"
+    },
+    {
+      "path": "risus.cfg.example",
+      "accessCount": 2,
+      "lastAccessed": 1777750535113,
+      "type": "file"
+    },
+    {
+      "path": "tests/unit/test_config.py",
+      "accessCount": 2,
+      "lastAccessed": 1777750547404,
       "type": "file"
     },
     {
@@ -149,18 +263,6 @@
       "type": "file"
     },
     {
-      "path": ".specify/templates/spec-template.md",
-      "accessCount": 1,
-      "lastAccessed": 1777738989790,
-      "type": "file"
-    },
-    {
-      "path": ".specify/templates/tasks-template.md",
-      "accessCount": 1,
-      "lastAccessed": 1777738990230,
-      "type": "file"
-    },
-    {
       "path": "CONTRIBUTING.md",
       "accessCount": 1,
       "lastAccessed": 1777738990586,
@@ -170,6 +272,24 @@
       "path": ".markdownlint.json",
       "accessCount": 1,
       "lastAccessed": 1777739996733,
+      "type": "file"
+    },
+    {
+      "path": ".specify/feature.json",
+      "accessCount": 1,
+      "lastAccessed": 1777744482063,
+      "type": "file"
+    },
+    {
+      "path": "client/ws_client.py",
+      "accessCount": 1,
+      "lastAccessed": 1777745014607,
+      "type": "file"
+    },
+    {
+      "path": "specs/003-standalone-client/PROMPT.md",
+      "accessCount": 1,
+      "lastAccessed": 1777749396158,
       "type": "file"
     }
   ],
