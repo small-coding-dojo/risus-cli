@@ -7,6 +7,21 @@
 having python installed. As a developer I want to give a client application
 to the players, which they can use without having python installed."
 
+## Clarifications
+
+### Session 2026-05-02
+
+- Q: Can players launch the client by double-clicking without command-line
+  arguments and still connect? → A: Yes — if server address or display name
+  are not provided as CLI args, the client prompts for them interactively
+  before connecting. CLI args skip the prompts.
+- Q: Should the interactive server address prompt suggest a default value? →
+  A: A configuration file specifies the default server address and port; the
+  prompt pre-fills from this file when present.
+- Q: Should the app persist connection parameters for future sessions? →
+  A: Yes — on normal exit the client writes the last-used server address and
+  display name to the configuration file as new defaults.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Download and Run Client (Priority: P1)
@@ -33,6 +48,17 @@ the battle manager connects and operates normally.
 3. **Given** a player on Windows, macOS, or Linux, **When** they run the
    platform-appropriate package, **Then** the client connects to a running
    Risus server.
+4. **Given** a player double-clicks the executable without providing any
+   command-line arguments, **When** the application starts, **Then** it
+   prompts the player to enter the server address and their display name
+   before connecting.
+5. **Given** a player launches the executable with server address and name
+   as command-line arguments, **When** the application starts, **Then** it
+   connects immediately without showing interactive prompts.
+6. **Given** a player has connected and then exits the application normally,
+   **When** they launch the client again, **Then** the server address and
+   display name prompts are pre-filled with the values from the previous
+   session.
 
 ---
 
@@ -90,6 +116,22 @@ player-facing instructions from start to finish on a clean machine.
   a standalone binary?
 - What happens if the player runs an outdated client against a newer server
   version?
+- What happens if the player presses Enter with an empty server address or
+  display name in the interactive prompt? (FR-010: re-prompt until non-empty)
+- What happens if the player provides a server address via CLI but omits the
+  display name (or vice versa)? The missing argument triggers a prompt for
+  the omitted value only.
+- What happens if the configuration file is present but contains an invalid
+  or malformed server address? The client shows the raw value as the default
+  hint; connection failure is reported at connect time, not at prompt time.
+- What happens if the configuration file is missing? Server address prompt
+  shows no default; player types the address manually.
+- What happens if writing the config file on exit fails (read-only
+  filesystem, no write permission)? The application closes normally without
+  reporting an error; saving is best-effort (FR-013).
+- What happens if the application is killed forcefully (SIGKILL, Task
+  Manager)? The on-exit save does not run; previously saved defaults are
+  retained from the last successful write.
 
 ## Requirements *(mandatory)*
 
@@ -109,6 +151,26 @@ player-facing instructions from start to finish on a clean machine.
   run the client.
 - **FR-007**: The distributed package MUST display a meaningful error message
   if the server is unreachable, rather than a raw Python traceback.
+- **FR-008**: When launched without command-line arguments, the client MUST
+  interactively prompt the player for the server address and their display
+  name before attempting to connect. Both prompts MUST pre-fill defaults
+  from the configuration file when values are present.
+- **FR-011**: The client MUST read a configuration file from a well-known
+  location to obtain the default server address, port, and display name. If
+  no configuration file is present, prompts show no defaults.
+- **FR-012**: Players MUST be able to edit the configuration file manually
+  (plain text) to set their preferred default server address, port, and
+  display name without launching the client.
+- **FR-013**: On normal exit, the client MUST write the last-used server
+  address and display name to the configuration file. If the write fails
+  (e.g., read-only filesystem), the failure MUST be silently ignored and
+  the application MUST still close normally.
+- **FR-009**: When launched with server address and display name as
+  command-line arguments, the client MUST connect directly without showing
+  interactive prompts.
+- **FR-010**: If the player provides an empty value for a required prompt
+  (server address or display name), the client MUST re-prompt until a
+  non-empty value is entered.
 
 ### Key Entities
 
@@ -149,3 +211,14 @@ player-facing instructions from start to finish on a clean machine.
 - Code signing and notarization for OS security gatekeeping is out of scope
   for the initial version, but players will be informed of any manual trust
   steps needed.
+- The configuration file stores connection defaults only (server address,
+  port, and display name) — not battle state. The client both reads and
+  writes this file. This is distinct from the local persistence prohibition
+  in the project constitution, which explicitly targets battle state I/O.
+  Planning phase must confirm this interpretation or raise a minor
+  constitution amendment.
+- Configuration file format is plain text (key=value) so players can edit
+  it with any text editor on any platform.
+- Configuration file location is same directory as the running executable
+  (project root when running from source); exact path resolution is a
+  planning decision.
