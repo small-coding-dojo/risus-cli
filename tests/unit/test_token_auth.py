@@ -103,7 +103,7 @@ def test_risus_token_unset_rejects_all(no_token_client):
 
 @pytest.mark.parametrize("server,expected_prefix", [
     ("localhost:8765", "ws://"),
-    ("risus.boos.systems", "wss://"),
+    ("risus.example.com", "wss://"),
     ("[::1]:8765", "ws://"),
 ])
 def test_scheme_detection(server, expected_prefix):
@@ -123,8 +123,8 @@ def test_ws_uri_derives_http_base():
 
 
 def test_wss_uri_derives_https_base():
-    assert _http_base_url("wss://risus.boos.systems/ws/Name") == "https://risus.boos.systems"
+    assert _http_base_url("wss://risus.example.com/ws/Name") == "https://risus.example.com"
 
 
 def test_wss_uri_no_double_replace():
-    assert _http_base_url("wss://risus.boos.systems/ws/Name") == "https://risus.boos.systems"
+    assert _http_base_url("wss://risus.example.com/ws/Name") == "https://risus.example.com"

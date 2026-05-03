@@ -60,7 +60,7 @@ imported by `risus.py`.
 
 **Decision**: `":" in server` → `ws://`, else → `wss://`.
 
-**Rationale**: `"localhost:8765"` contains a colon; `"risus.boos.systems"`
+**Rationale**: `"localhost:8765"` contains a colon; `"risus.example.com"`
 does not. IPv6 addresses (`[::1]:8765`) also contain a colon and should use
 plain WS for local dev. The spec acceptance criteria (US4) use exactly this
 heuristic.
@@ -77,7 +77,7 @@ heuristic.
 server_base = ws._uri.replace("ws://", "http://").rsplit("/ws/", 1)[0]
 ```
 
-`wss://risus.boos.systems/ws/Conan` → `ws://risus.boos.systems/ws/Conan`
+`wss://risus.example.com/ws/Conan` → `ws://risus.example.com/ws/Conan`
 (broken — ws:// not replaced).
 
 **Fixed**:

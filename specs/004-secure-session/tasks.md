@@ -156,7 +156,7 @@ Goal: Bare hostname → `wss://`; `host:port` → `ws://`; `load_battle()`
 works with both schemes; deployment artifacts ready.
 
 Independent test: Build URI with `localhost:8765` → `ws://`; build URI with
-`risus.boos.systems` → `wss://`.
+`risus.example.com` → `wss://`.
 
 ### Implementation for User Story 4
 
@@ -177,7 +177,7 @@ Independent test: Build URI with `localhost:8765` → `ws://`; build URI with
   - `caddy_data` volume for cert persistence
 - [ ] T021 [P] [US4] Write scheme detection unit tests in
   `tests/unit/test_token_auth.py`
-  - `"localhost:8765"` → `ws://`; `"risus.boos.systems"` → `wss://`
+  - `"localhost:8765"` → `ws://`; `"risus.example.com"` → `wss://`
   - `"[::1]:8765"` → `ws://`
 - [ ] T022 [P] [US4] Write `load_battle()` URL derivation unit tests in
   `tests/unit/test_token_auth.py`

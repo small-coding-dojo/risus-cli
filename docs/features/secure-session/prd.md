@@ -53,7 +53,7 @@ Encrypt all traffic in transit via TLS.
 | AC-S3 | Client with correct token → connects and receives state |
 | AC-S4 | Token saved to `risus.cfg`; not prompted again on restart |
 | AC-S5 | `--token` bypasses prompt |
-| AC-S6 | `localhost:8765` → `ws://`; `risus.boos.systems` → `wss://` |
+| AC-S6 | `localhost:8765` → `ws://`; `risus.example.com` → `wss://` |
 | AC-S7 | `load_battle()` works on both `ws://` and `wss://` connections |
 
 ## Constitution Amendment Required

@@ -111,12 +111,12 @@ Unit tests are identical for both runtimes — no container dependency.
 
 **Docker:**
 ```bash
-CONTAINER_ENGINE=docker RISUS_TOKEN=testtoken pytest tests/e2e -m e2e -q
+CONTAINER_ENGINE=docker RISUS_TOKEN=test-token-for-e2e pytest tests/e2e -m e2e -q
 ```
 
 **Podman:**
 ```bash
-PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman RISUS_TOKEN=testtoken pytest tests/e2e -m e2e -q
+PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman RISUS_TOKEN=test-token-for-e2e pytest tests/e2e -m e2e -q
 ```
 
 E2E tests spin up and tear down the full stack automatically using the project's `docker-compose.yml`. `RISUS_TOKEN` is required — the server rejects connections without it.
@@ -143,6 +143,83 @@ PATH=$PWD/.venv/bin:$PATH podman-compose down -v
 ```
 
 > **Note:** Schema changes require `down -v` because Postgres initialises the schema on first boot from `server/schema.sql`. A running volume will not re-initialise.
+
+---
+
+## Production Deployment (Hetzner)
+
+This guide assumes a Hetzner Cloud VM is already provisioned and SSH-accessible.
+
+### 1. DNS — Hetzner KonsoleH
+
+1. Log in to [konsole.hetzner.com](https://konsole.hetzner.com)
+2. Navigate to **Domains → example.com → DNS Records**
+3. Add an A record:
+   - **Name**: `risus`
+   - **Value**: your VM's public IPv4 address
+   - **TTL**: `300`
+4. Wait for propagation (usually under 5 minutes). Verify: `dig risus.example.com`
+
+### 2. VM Firewall
+
+Ports 80 and 443 must be reachable from the internet (Caddy needs port 80 for the Let's Encrypt ACME challenge). Port 8765 stays loopback-only — never expose it.
+
+In Hetzner Cloud Console → Firewalls, allow inbound:
+
+| Protocol | Port | Source |
+|----------|------|--------|
+| TCP | 80 | 0.0.0.0/0, ::/0 |
+| TCP | 443 | 0.0.0.0/0, ::/0 |
+
+### 3. Server Setup
+
+On the VM, in the repo root with venv active:
+
+```bash
+export RISUS_TOKEN=your-secret-token-here   # min 16 chars — share with players
+export DOMAIN=risus.example.com
+```
+
+Start the full stack including the Caddy TLS proxy:
+
+**Podman:**
+```bash
+PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman podman-compose --profile production up -d --build
+```
+
+**Docker:**
+```bash
+docker compose --profile production up -d --build
+```
+
+Caddy automatically obtains a Let's Encrypt TLS certificate for `risus.example.com` on first startup. This requires DNS propagation to be complete and ports 80/443 open.
+
+### 4. Verify
+
+```bash
+curl -fsS https://risus.example.com/healthz
+# → {"ok":true}
+```
+
+### 5. Connect Clients
+
+Bare hostname → client automatically uses `wss://` (TLS):
+
+```bash
+python risus.py risus.example.com YourName --token your-secret-token-here
+```
+
+Token travels encrypted inside the TLS connection. Caddy access logging is off by default — token never appears in logs.
+
+### 6. Persist Token Across Reboots
+
+Add to `/etc/environment` or a systemd drop-in so the token survives VM restarts:
+
+```bash
+# /etc/environment (persistent across reboots)
+RISUS_TOKEN=your-secret-token-here
+DOMAIN=risus.example.com
+```
 
 ---
 

@@ -105,7 +105,7 @@ confirm the correct protocol is selected in each case.
    **When** the client builds the connection URI, **Then** an unencrypted
    local protocol is used.
 2. **Given** the server address is a bare hostname without a port (e.g.
-   `risus.boos.systems`), **When** the client builds the connection URI,
+   `risus.example.com`), **When** the client builds the connection URI,
    **Then** an encrypted protocol is used.
 
 ---

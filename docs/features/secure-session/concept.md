@@ -3,7 +3,7 @@
 ## Architecture
 
 ```
-Player → wss://risus.boos.systems/ws/{name}?token=SECRET
+Player → wss://risus.example.com/ws/{name}?token=SECRET
               ↓ port 443 (TLS terminated)
            Caddy  (Let's Encrypt, auto-HTTPS)
               ↓ ws://127.0.0.1:8765/ws/{name}?token=SECRET
@@ -65,7 +65,7 @@ Caddy does not inspect the token — it proxies the full query string through.
 
 ### `Caddyfile` (new file, project root)
 ```
-risus.boos.systems {
+risus.example.com {
     reverse_proxy ws://127.0.0.1:8765
 }
 ```
@@ -87,4 +87,4 @@ reachable for the ACME HTTP-01 challenge.
 
 **Scheme detection** (unit, no network):
 - `"localhost:8765"` → `ws://localhost:8765/ws/...`
-- `"risus.boos.systems"` → `wss://risus.boos.systems/ws/...`
+- `"risus.example.com"` → `wss://risus.example.com/ws/...`
