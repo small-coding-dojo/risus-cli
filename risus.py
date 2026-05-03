@@ -290,6 +290,10 @@ def reduce_dice():
 
 
 def main():
+    if getattr(sys, "frozen", False):
+        import certifi
+        os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+
     base_dir = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).parent
 
     parser = argparse.ArgumentParser(description="Risus battle manager")
