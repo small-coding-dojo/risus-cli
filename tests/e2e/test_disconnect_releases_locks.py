@@ -6,7 +6,7 @@ import time
 import pytest
 import websockets
 
-from tests.e2e.conftest import WS_URL
+from tests.e2e.conftest import TOKEN, WS_URL
 
 pytestmark = pytest.mark.e2e
 
@@ -36,8 +36,8 @@ async def _add_player_and_wait(ws, name: str) -> None:
 async def test_locks_freed_on_disconnect(risus_stack):
     """Graceful disconnect: Alice locks then closes; Bob receives lock_released and can acquire."""
     # Bob must outlive Alice — Bob is the outer context
-    async with websockets.connect(f"{WS_URL}/ws/DiscoBob") as bob:
-        async with websockets.connect(f"{WS_URL}/ws/DiscoAlice") as alice:
+    async with websockets.connect(f"{WS_URL}/ws/DiscoBob?token={TOKEN}") as bob:
+        async with websockets.connect(f"{WS_URL}/ws/DiscoAlice?token={TOKEN}") as alice:
             await _drain_initial(alice)
             await _drain_initial(bob)
 
@@ -67,8 +67,8 @@ async def test_lock_freed_within_30s(risus_stack):
     without a graceful WS close handshake, verifying the server's keepalive
     (ping_interval=20, ping_timeout=10) detects the dead connection and releases locks.
     """
-    async with websockets.connect(f"{WS_URL}/ws/AbruptBob") as bob:
-        alice = await websockets.connect(f"{WS_URL}/ws/AbruptAlice")
+    async with websockets.connect(f"{WS_URL}/ws/AbruptBob?token={TOKEN}") as bob:
+        alice = await websockets.connect(f"{WS_URL}/ws/AbruptAlice?token={TOKEN}")
         try:
             await _drain_initial(alice)
             await _drain_initial(bob)

@@ -10,7 +10,7 @@ import urllib.request
 from pathlib import Path
 
 import client.config
-from client.ws_client import WSClient
+from client.ws_client import AuthError, WSClient
 
 _client: WSClient | None = None
 
@@ -114,18 +114,38 @@ def _prompt_required(label: str, default: str | None) -> str:
             return default
 
 
-def connect_or_die(server: str, name: str) -> None:
+def _prompt_token(saved: str | None) -> str:
+    """Prompt for session token; minimum 16 printable non-whitespace chars."""
+    while True:
+        hint = f" [{saved}]" if saved is not None else ""
+        val = input(f"Session token{hint}: ").strip()
+        if not val:
+            if saved is not None:
+                return saved
+            continue
+        if sum(1 for c in val if c.isprintable() and not c.isspace()) < 16:
+            print("  Token must be at least 16 printable non-whitespace characters.")
+            continue
+        return val
+
+
+def connect_or_die(server: str, name: str, token: str) -> str:
     global _client
-    _client = WSClient()
-    try:
-        _client.start(server, name, timeout=10.0)
-    except TimeoutError:
-        print(f"Cannot reach server at {server}. Check address and try again.")
-        sys.exit(1)
-    except Exception as exc:
-        print(f"  Connection failed: {exc}")
-        sys.exit(1)
-    _client.drain_inbox()
+    while True:
+        _client = WSClient()
+        try:
+            _client.start(server, name, token, timeout=10.0)
+            _client.drain_inbox()
+            return token
+        except AuthError:
+            print("  Connection rejected: invalid or missing token.")
+            token = _prompt_token(None)
+        except TimeoutError:
+            print(f"Cannot reach server at {server}. Check address and try again.")
+            sys.exit(1)
+        except Exception as exc:
+            print(f"  Connection failed: {exc}")
+            sys.exit(1)
 
 
 def add_player():
@@ -192,13 +212,17 @@ def save_battle():
     input("  Press Enter...")
 
 
+def _http_base_url(ws_uri: str) -> str:
+    return ws_uri.replace("wss://", "https://").replace("ws://", "http://").rsplit("/ws/", 1)[0]
+
+
 def load_battle():
     clear()
     show_state()
     print("[ Load Battle ]")
     # Fetch save list from REST
     ws = _ws()
-    server_base = ws._uri.replace("ws://", "http://").rsplit("/ws/", 1)[0]
+    server_base = _http_base_url(ws._uri)
     try:
         with urllib.request.urlopen(f"{server_base}/saves", timeout=5) as resp:
             saves = json.loads(resp.read())
@@ -271,16 +295,17 @@ def main():
     parser = argparse.ArgumentParser(description="Risus battle manager")
     parser.add_argument("server", nargs="?", default=None, help="Server address (host:port)")
     parser.add_argument("name", nargs="?", default=None, help="Display name")
+    parser.add_argument("--token", default=None, help="Session token")
     args = parser.parse_args()
 
-    saved_server, saved_name = client.config.read_config(base_dir)
+    saved_server, saved_name, saved_token = client.config.read_config(base_dir)
 
     server = args.server or _prompt_required("Server address", saved_server)
     name = args.name or _prompt_required("Your name", saved_name)
 
-    atexit.register(client.config.write_config, base_dir, server, name)
-
-    connect_or_die(server, name)
+    token = args.token or saved_token or _prompt_token(None)
+    token = connect_or_die(server, name, token)
+    atexit.register(client.config.write_config, base_dir, server, name, token)
 
     while True:
         clear()

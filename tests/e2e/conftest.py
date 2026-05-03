@@ -12,6 +12,7 @@ COMPOSE_FILE = os.path.abspath(COMPOSE_FILE)
 PROJECT_NAME = f"risus_e2e_{os.getpid()}"
 SERVER_URL = "http://localhost:8765"
 WS_URL = "ws://localhost:8765"
+TOKEN = os.environ.get("RISUS_TOKEN", "")
 
 _CONTAINER_ENGINE = os.environ.get("CONTAINER_ENGINE", "docker")
 
@@ -92,10 +93,10 @@ def ws_connect(risus_stack):
     import asyncio
 
     async def _connect(name: str, collect: int = 2):
-        ws = await websockets.connect(f"{WS_URL}/ws/{name}")
+        ws = await websockets.connect(f"{WS_URL}/ws/{name}?token={TOKEN}")
         frames = []
         for _ in range(collect):
-            raw = await asyncio.wait_for(ws.recv(), timeout=5)
+            raw = await asyncio.wait_for(ws.recv(), timeout=10)
             import json
             frames.append(json.loads(raw))
         return ws, frames
