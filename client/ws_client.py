@@ -40,8 +40,9 @@ class WSClient:
                     raise AuthError("token rejected by server")
                 if ft == "disconnected":
                     raise TimeoutError(f"No response from server at {server} within {timeout}s")
-                if ft != "connected":
-                    self._inbox.put(frame)
+                if ft == "connected":
+                    continue
+                self._inbox.put(frame)
                 return
             except queue.Empty:
                 pass
