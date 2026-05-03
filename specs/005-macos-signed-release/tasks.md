@@ -16,7 +16,7 @@
 
 **Purpose**: New build artifact required before any signing step can run.
 
-- [ ] T001 Create `build/entitlements.plist` with 4 entitlements required for PyInstaller Python runtime under Hardened Runtime: `com.apple.security.cs.allow-jit`, `com.apple.security.cs.allow-unsigned-executable-memory`, `com.apple.security.cs.allow-dyld-environment-variables`, `com.apple.security.cs.disable-library-validation` (all `true`)
+- [x] T001 Create `build/entitlements.plist` with 4 entitlements required for PyInstaller Python runtime under Hardened Runtime: `com.apple.security.cs.allow-jit`, `com.apple.security.cs.allow-unsigned-executable-memory`, `com.apple.security.cs.allow-dyld-environment-variables`, `com.apple.security.cs.disable-library-validation` (all `true`)
 
 ---
 
@@ -26,7 +26,7 @@
 
 **⚠️ CRITICAL**: T002 must be complete before US1 signing steps can run.
 
-- [ ] T002 Add `apple-actions/import-codesign-certs@v7` step (`if: runner.os == 'macOS'`) to macOS matrix job in `.github/workflows/release.yml` with `p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}` and `p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}` — action handles keychain creation, import, and cleanup automatically; T003 no longer needed
+- [x] T002 Add `apple-actions/import-codesign-certs@v7` step (`if: runner.os == 'macOS'`) to macOS matrix job in `.github/workflows/release.yml` with `p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}` and `p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}` — action handles keychain creation, import, and cleanup automatically; T003 no longer needed
 
 **Checkpoint**: Keychain lifecycle in place — US1 signing steps can now be added.
 
@@ -40,11 +40,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Add `codesign --force --verbose --timestamp --sign "Developer ID Application: $APPLE_TEAM_ID" --options=runtime --no-strict --entitlements build/entitlements.plist dist/risus-macos-arm64` step (`if: runner.os == 'macOS'`) after binary rename in `.github/workflows/release.yml`
-- [ ] T005 [US1] Add `ditto -c -k --keepParent dist/risus-macos-arm64 dist/risus-macos-arm64.zip` step (`if: runner.os == 'macOS'`) after signing in `.github/workflows/release.yml`
-- [ ] T006 [US1] Add `xcrun notarytool submit dist/risus-macos-arm64.zip --wait --key /tmp/apple_api_key.p8 --key-id $APPLE_API_KEY_ID --issuer $APPLE_API_ISSUER_ID` step (`if: runner.os == 'macOS'`, `timeout-minutes: 15`) in `.github/workflows/release.yml` — decode `APPLE_API_KEY_CONTENT` to `/tmp/apple_api_key.p8` before calling notarytool, delete the file after
-- [ ] T007 [US1] Update the "Compute checksum (Unix)" step in `.github/workflows/release.yml` to hash `risus-macos-arm64.zip` on macOS (not the bare binary) — use `if: runner.os == 'macOS'` for the new step and `if: runner.os == 'Linux'` for the existing Linux step
-- [ ] T008 [US1] Update the macOS artifact upload step in `.github/workflows/release.yml` — change `path` to upload `dist/risus-macos-arm64.zip` and `dist/risus-macos-arm64.zip.sha256` instead of the bare binary
+- [x] T004 [US1] Add `codesign --force --verbose --timestamp --sign "Developer ID Application: $APPLE_TEAM_ID" --options=runtime --no-strict --entitlements build/entitlements.plist dist/risus-macos-arm64` step (`if: runner.os == 'macOS'`) after binary rename in `.github/workflows/release.yml`
+- [x] T005 [US1] Add `ditto -c -k --keepParent dist/risus-macos-arm64 dist/risus-macos-arm64.zip` step (`if: runner.os == 'macOS'`) after signing in `.github/workflows/release.yml`
+- [x] T006 [US1] Add `xcrun notarytool submit dist/risus-macos-arm64.zip --wait --key /tmp/apple_api_key.p8 --key-id $APPLE_API_KEY_ID --issuer $APPLE_API_ISSUER_ID` step (`if: runner.os == 'macOS'`, `timeout-minutes: 15`) in `.github/workflows/release.yml` — decode `APPLE_API_KEY_CONTENT` to `/tmp/apple_api_key.p8` before calling notarytool, delete the file after
+- [x] T007 [US1] Update the "Compute checksum (Unix)" step in `.github/workflows/release.yml` to hash `risus-macos-arm64.zip` on macOS (not the bare binary) — use `if: runner.os == 'macOS'` for the new step and `if: runner.os == 'Linux'` for the existing Linux step
+- [x] T008 [US1] Update the macOS artifact upload step in `.github/workflows/release.yml` — change `path` to upload `dist/risus-macos-arm64.zip` and `dist/risus-macos-arm64.zip.sha256` instead of the bare binary
 
 **Checkpoint**: Tag a release and confirm the macOS artifact in GitHub Releases is `risus-macos-arm64.zip`, passes `spctl --assess`, and requires no System Settings exception.
 
@@ -58,8 +58,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Add post-notarization verification step (`if: runner.os == 'macOS'`) in `.github/workflows/release.yml` — run `codesign --verify --deep --strict --verbose=2 dist/risus-macos-arm64` and `spctl --assess --type execute --verbose dist/risus-macos-arm64`; job fails if either command exits non-zero
-- [ ] T010 [P] [US2] Add "Signing Setup" subsection to the Release Checklist in `AGENTS.md` documenting the 6 required GitHub Actions secrets (`APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_TEAM_ID`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER_ID`, `APPLE_API_KEY_CONTENT`) and how to obtain each (reference `specs/005-macos-signed-release/quickstart.md` for full setup steps)
+- [x] T009 [US2] Add post-notarization verification step (`if: runner.os == 'macOS'`) in `.github/workflows/release.yml` — run `codesign --verify --deep --strict --verbose=2 dist/risus-macos-arm64` and `spctl --assess --type execute --verbose dist/risus-macos-arm64`; job fails if either command exits non-zero
+- [x] T010 [P] [US2] Add "Signing Setup" subsection to the Release Checklist in `AGENTS.md` documenting the 6 required GitHub Actions secrets (`APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_TEAM_ID`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER_ID`, `APPLE_API_KEY_CONTENT`) and how to obtain each (reference `specs/005-macos-signed-release/quickstart.md` for full setup steps)
 
 **Checkpoint**: CI run produces a verifiable artifact; developer can confirm signing with `codesign` and `spctl` without any manual steps.
 
@@ -73,8 +73,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T011 [US3] Update `on.push.branches` in `.github/workflows/build.yml` to add `005-macos-signed-release` so CI runs on this feature branch during development
-- [ ] T012 [P] [US3] Add a pre-tag check to the Release Checklist in `AGENTS.md`: verify all 6 Apple signing secrets are configured in repository Settings → Secrets before pushing a release tag
+- [x] T011 [US3] Update `on.push.branches` in `.github/workflows/build.yml` to add `005-macos-signed-release` so CI runs on this feature branch during development
+- [x] T012 [P] [US3] Add a pre-tag check to the Release Checklist in `AGENTS.md`: verify all 6 Apple signing secrets are configured in repository Settings → Secrets before pushing a release tag
 
 **Checkpoint**: Tagged release with secrets configured completes notarization automatically; secrets missing causes clear CI failure before any artifact is uploaded.
 
@@ -84,7 +84,7 @@
 
 **Purpose**: Documentation and release checklist hygiene.
 
-- [ ] T013 [P] Update the macOS entry in the release workflow job name in `.github/workflows/release.yml` from `Build (macos-latest)` to `Build & Sign (macos-latest)` for clarity in the GitHub Actions UI
+- [x] T013 [P] Update the macOS entry in the release workflow job name in `.github/workflows/release.yml` from `Build (macos-latest)` to `Build & Sign (macos-latest)` for clarity in the GitHub Actions UI
 - [ ] T014 Run manual end-to-end verification per `specs/005-macos-signed-release/quickstart.md` against the first notarized release artifact
 
 ---
