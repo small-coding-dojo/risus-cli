@@ -77,8 +77,9 @@ the supplied token is used.
 **Acceptance Scenarios**:
 
 1. **Given** a `--token` argument is passed on launch, **When** the client
-   starts, **Then** no prompt is shown and the supplied token is used for the
-   connection.
+   starts, **Then** no prompt is shown, the supplied token is used for the
+   connection, and the token is persisted to `risus.cfg` on clean exit only
+   if the connection succeeds; a server-rejected token MUST NOT be saved.
 2. **Given** a `--token` argument is passed and a different token is stored in
    config, **When** the client connects, **Then** the command-line token takes
    precedence over the stored one.
@@ -182,8 +183,9 @@ confirm the correct protocol is selected in each case.
 - **SC-004**: Connections to bare-hostname server addresses are always made
   over an encrypted channel; connections to host:port addresses use a local
   channel.
-- **SC-005**: All 7 acceptance criteria defined in the PRD (AC-S1 through
-  AC-S7) pass in automated tests.
+- **SC-005**: All acceptance scenarios defined across User Stories 1–4 pass in
+  automated tests: US1 (4 scenarios), US2 (3 scenarios), US3 (2 scenarios),
+  US4 (2 scenarios).
 
 ## Clarifications
 
