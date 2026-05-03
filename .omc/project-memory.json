@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": ".venv/bin/pytest tests/unit -q 2>&1 && .venv/bin/ruff check risus.py client/ws_client.py 2>&1",
+    "testCommand": ".venv/bin/pytest tests/unit -q 2>&1",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -169,26 +169,26 @@
     },
     {
       "path": "AGENTS.md",
-      "accessCount": 22,
-      "lastAccessed": 1777812713591,
+      "accessCount": 26,
+      "lastAccessed": 1777830524089,
       "type": "file"
     },
     {
       "path": ".specify/memory/constitution.md",
+      "accessCount": 23,
+      "lastAccessed": 1777831335578,
+      "type": "file"
+    },
+    {
+      "path": "client/ws_client.py",
       "accessCount": 21,
-      "lastAccessed": 1777812763030,
+      "lastAccessed": 1777829969586,
       "type": "file"
     },
     {
       "path": "specs/003-standalone-client/spec.md",
       "accessCount": 20,
       "lastAccessed": 1777749597169,
-      "type": "file"
-    },
-    {
-      "path": "client/ws_client.py",
-      "accessCount": 20,
-      "lastAccessed": 1777829327554,
       "type": "file"
     },
     {
@@ -222,6 +222,12 @@
       "type": "file"
     },
     {
+      "path": "pyproject.toml",
+      "accessCount": 12,
+      "lastAccessed": 1777830092269,
+      "type": "file"
+    },
+    {
       "path": "specs/004-secure-session/plan.md",
       "accessCount": 11,
       "lastAccessed": 1777793576461,
@@ -237,6 +243,12 @@
       "path": "tests/unit/test_token_auth.py",
       "accessCount": 11,
       "lastAccessed": 1777829168275,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 11,
+      "lastAccessed": 1777831479114,
       "type": "file"
     },
     {
@@ -264,12 +276,6 @@
       "type": "file"
     },
     {
-      "path": "pyproject.toml",
-      "accessCount": 10,
-      "lastAccessed": 1777829267614,
-      "type": "file"
-    },
-    {
       "path": "specs/003-standalone-client/data-model.md",
       "accessCount": 9,
       "lastAccessed": 1777748689564,
@@ -285,12 +291,6 @@
       "path": "README.md",
       "accessCount": 9,
       "lastAccessed": 1777754918429,
-      "type": "file"
-    },
-    {
-      "path": "CLAUDE.md",
-      "accessCount": 9,
-      "lastAccessed": 1777792045335,
       "type": "file"
     },
     {
@@ -372,9 +372,21 @@
       "type": "file"
     },
     {
+      "path": ".specify/feature.json",
+      "accessCount": 5,
+      "lastAccessed": 1777830776429,
+      "type": "file"
+    },
+    {
       "path": "specs/004-secure-session/checklists/requirements.md",
       "accessCount": 4,
       "lastAccessed": 1777791778635,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/tasks-template.md",
+      "accessCount": 4,
+      "lastAccessed": 1777831528588,
       "type": "file"
     },
     {
@@ -387,18 +399,6 @@
       "path": ".specify/templates/spec-template.md",
       "accessCount": 3,
       "lastAccessed": 1777791070410,
-      "type": "file"
-    },
-    {
-      "path": ".specify/feature.json",
-      "accessCount": 3,
-      "lastAccessed": 1777791146829,
-      "type": "file"
-    },
-    {
-      "path": ".specify/templates/tasks-template.md",
-      "accessCount": 3,
-      "lastAccessed": 1777792667551,
       "type": "file"
     },
     {
