@@ -203,3 +203,21 @@ complete until `git push` succeeds.
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
+
+---
+
+## Release Checklist
+
+Steps to publish a new release binary:
+
+1. **Bump `pyproject.toml`** — update `version` field to next semver (`1.x.y`)
+2. **Commit** the version bump: `build(deps): bump version to 1.x.y`
+3. **Push** to `main`
+4. **Tag and push tag**:
+   ```bash
+   git tag v1.x.y
+   git push origin v1.x.y
+   ```
+5. GitHub Actions builds and publishes binaries automatically on tag push.
+
+**Hard rule:** Never push a release tag without first bumping `pyproject.toml` — the binary reports the version baked at build time.
