@@ -35,9 +35,13 @@ class WSClient:
         while time.monotonic() < deadline:
             try:
                 frame = self._inbox.get(timeout=0.2)
-                if frame.get("type") == "auth_failed":
+                ft = frame.get("type")
+                if ft == "auth_failed":
                     raise AuthError("token rejected by server")
-                self._inbox.put(frame)
+                if ft == "disconnected":
+                    raise TimeoutError(f"No response from server at {server} within {timeout}s")
+                if ft != "connected":
+                    self._inbox.put(frame)
                 return
             except queue.Empty:
                 pass
@@ -73,6 +77,7 @@ class WSClient:
             try:
                 async with websockets.connect(self._uri) as ws:
                     delay_idx = 0
+                    self._inbox.put({"type": "connected"})
                     await asyncio.gather(
                         self._reader(ws),
                         self._writer(ws),

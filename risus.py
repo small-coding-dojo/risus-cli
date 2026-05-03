@@ -141,7 +141,7 @@ def connect_or_die(server: str, name: str, token: str) -> str:
             print("  Connection rejected: invalid or missing token.")
             token = _prompt_token(None)
         except TimeoutError:
-            print(f"Cannot reach server at {server}. Check address and try again.")
+            print(f"Connection to {server} failed — check address, network, and that the server is running.")
             sys.exit(1)
         except Exception as exc:
             print(f"  Connection failed: {exc}")

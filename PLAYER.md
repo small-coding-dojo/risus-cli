@@ -78,7 +78,8 @@ A template file `risus.cfg.example` is included in the release — copy it to
 
 | Symptom | Fix |
 | ------- | --- |
-| `Cannot reach server` | Check that the server is running and the address/port is correct |
+| `Connection to … failed` | Check that the server is running and the address is correct |
+| Menu appears instantly, no players listed, no delay | Client did not connect. Check `risus.cfg` exists in the same folder as the binary. If the server uses TLS (e.g. `risus.example.com`), the address must have **no port** — a `host:port` address forces an unencrypted connection |
 | Permission denied (Unix) | Run `chmod +x <filename>` first |
 | macOS blocks the app | Follow Step 2 above |
 | Windows SmartScreen warning | Click **More info → Run anyway** |
