@@ -152,8 +152,8 @@ This guide assumes a Hetzner Cloud VM is already provisioned and SSH-accessible.
 
 ### 1. DNS — Hetzner KonsoleH
 
-1. Log in to [konsole.hetzner.com](https://konsole.hetzner.com)
-2. Navigate to **Domains → example.com → DNS Records**
+1. Log in to [konsoleh.hetzner.com](https://konsoleh.hetzner.com)
+2. Navigate to **Settings → DNS-Management → Open DNS Panel**
 3. Add an A record:
    - **Name**: `risus`
    - **Value**: your VM's public IPv4 address
@@ -173,7 +173,18 @@ In Hetzner Cloud Console → Firewalls, allow inbound:
 
 ### 3. Server Setup
 
-On the VM, in the repo root with venv active:
+On the VM, allow rootless Podman containers to bind the public HTTP/HTTPS
+ports required by Caddy:
+
+```bash
+echo 'net.ipv4.ip_unprivileged_port_start=80' | sudo tee /etc/sysctl.d/99-rootless-low-ports.conf
+sudo sysctl --system
+```
+
+This permits rootless containers to listen on ports 80 and 443 without running
+the compose stack as root.
+
+In the repo root with venv active:
 
 ```bash
 export RISUS_TOKEN=your-secret-token-here   # min 16 chars — share with players
@@ -183,16 +194,21 @@ export DOMAIN=risus.example.com
 Start the full stack including the Caddy TLS proxy:
 
 **Podman:**
+
 ```bash
 PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman podman-compose --profile production up -d --build
 ```
 
 **Docker:**
+
 ```bash
 docker compose --profile production up -d --build
 ```
 
-Caddy automatically obtains a Let's Encrypt TLS certificate for `risus.example.com` on first startup. This requires DNS propagation to be complete and ports 80/443 open.
+Caddy automatically obtains a Let's Encrypt TLS certificate for
+`risus.example.com` on first startup. This requires DNS propagation to be
+complete, ports 80/443 open in the VM firewall, and low-port binding enabled
+when using rootless Podman.
 
 ### 4. Verify
 
