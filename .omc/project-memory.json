@@ -108,8 +108,14 @@
   "hotPaths": [
     {
       "path": "risus.py",
-      "accessCount": 29,
-      "lastAccessed": 1777751079617,
+      "accessCount": 30,
+      "lastAccessed": 1777789982910,
+      "type": "file"
+    },
+    {
+      "path": "specs/004-secure-session/spec.md",
+      "accessCount": 23,
+      "lastAccessed": 1777791771782,
       "type": "file"
     },
     {
@@ -120,8 +126,8 @@
     },
     {
       "path": "AGENTS.md",
-      "accessCount": 19,
-      "lastAccessed": 1777755049730,
+      "accessCount": 20,
+      "lastAccessed": 1777789316207,
       "type": "file"
     },
     {
@@ -131,15 +137,15 @@
       "type": "file"
     },
     {
-      "path": "specs/003-standalone-client/plan.md",
-      "accessCount": 13,
-      "lastAccessed": 1777750552764,
+      "path": ".specify/memory/constitution.md",
+      "accessCount": 15,
+      "lastAccessed": 1777790913621,
       "type": "file"
     },
     {
-      "path": ".specify/memory/constitution.md",
-      "accessCount": 11,
-      "lastAccessed": 1777750552686,
+      "path": "specs/003-standalone-client/plan.md",
+      "accessCount": 13,
+      "lastAccessed": 1777750552764,
       "type": "file"
     },
     {
@@ -191,6 +197,30 @@
       "type": "file"
     },
     {
+      "path": "docs/features/secure-session/concept.md",
+      "accessCount": 6,
+      "lastAccessed": 1777790692529,
+      "type": "file"
+    },
+    {
+      "path": "docs/features/secure-session/prd.md",
+      "accessCount": 5,
+      "lastAccessed": 1777790692581,
+      "type": "file"
+    },
+    {
+      "path": "client/config.py",
+      "accessCount": 4,
+      "lastAccessed": 1777789989328,
+      "type": "file"
+    },
+    {
+      "path": "specs/004-secure-session/checklists/requirements.md",
+      "accessCount": 4,
+      "lastAccessed": 1777791778635,
+      "type": "file"
+    },
+    {
       "path": "specs/003-standalone-client/checklists/requirements.md",
       "accessCount": 3,
       "lastAccessed": 1777744903324,
@@ -203,12 +233,6 @@
       "type": "file"
     },
     {
-      "path": "client/config.py",
-      "accessCount": 3,
-      "lastAccessed": 1777751032100,
-      "type": "file"
-    },
-    {
       "path": "PLAYER.md",
       "accessCount": 3,
       "lastAccessed": 1777755254097,
@@ -216,8 +240,14 @@
     },
     {
       "path": ".specify/templates/spec-template.md",
-      "accessCount": 2,
-      "lastAccessed": 1777744442610,
+      "accessCount": 3,
+      "lastAccessed": 1777791070410,
+      "type": "file"
+    },
+    {
+      "path": ".specify/feature.json",
+      "accessCount": 3,
+      "lastAccessed": 1777791146829,
       "type": "file"
     },
     {
@@ -242,6 +272,12 @@
       "path": "tests/unit/test_config.py",
       "accessCount": 2,
       "lastAccessed": 1777750547404,
+      "type": "file"
+    },
+    {
+      "path": "client/ws_client.py",
+      "accessCount": 2,
+      "lastAccessed": 1777789989398,
       "type": "file"
     },
     {
@@ -275,21 +311,21 @@
       "type": "file"
     },
     {
-      "path": ".specify/feature.json",
-      "accessCount": 1,
-      "lastAccessed": 1777744482063,
-      "type": "file"
-    },
-    {
-      "path": "client/ws_client.py",
-      "accessCount": 1,
-      "lastAccessed": 1777745014607,
-      "type": "file"
-    },
-    {
       "path": "specs/003-standalone-client/PROMPT.md",
       "accessCount": 1,
       "lastAccessed": 1777749396158,
+      "type": "file"
+    },
+    {
+      "path": "server/app.py",
+      "accessCount": 1,
+      "lastAccessed": 1777789320234,
+      "type": "file"
+    },
+    {
+      "path": "server/ws.py",
+      "accessCount": 1,
+      "lastAccessed": 1777789320306,
       "type": "file"
     }
   ],
