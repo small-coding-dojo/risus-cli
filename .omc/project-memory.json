@@ -169,8 +169,14 @@
     },
     {
       "path": "AGENTS.md",
+      "accessCount": 22,
+      "lastAccessed": 1777812713591,
+      "type": "file"
+    },
+    {
+      "path": ".specify/memory/constitution.md",
       "accessCount": 21,
-      "lastAccessed": 1777793677554,
+      "lastAccessed": 1777812763030,
       "type": "file"
     },
     {
@@ -183,12 +189,6 @@
       "path": "specs/004-secure-session/research.md",
       "accessCount": 18,
       "lastAccessed": 1777793585167,
-      "type": "file"
-    },
-    {
-      "path": ".specify/memory/constitution.md",
-      "accessCount": 18,
-      "lastAccessed": 1777793677250,
       "type": "file"
     },
     {

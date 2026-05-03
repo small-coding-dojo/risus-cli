@@ -103,7 +103,7 @@ eliminates a class of local-vs-server state divergence bugs.
 
 ```bash
 pytest tests/unit -q
-CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q
+PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman pytest tests/e2e -m e2e -q
 podman-compose up -d && curl -fsS http://localhost:8765/healthz
 ```
 
