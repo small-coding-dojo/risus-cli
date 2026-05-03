@@ -1,5 +1,6 @@
 """WS protocol integration tests using FastAPI TestClient with mocked DB."""
 from __future__ import annotations
+import asyncio
 import json
 import pytest
 from fastapi import FastAPI, WebSocket
@@ -8,6 +9,8 @@ from fastapi.testclient import TestClient
 from server.locks import LockManager
 from server.ws import ConnectionManager
 from server.rest import router as rest_router
+
+_TOKEN = "test-token-for-unit-tests"
 
 
 # ---------------------------------------------------------------------------
@@ -72,6 +75,13 @@ def patch_db(monkeypatch):
     monkeypatch.setattr(rest_mod, "load_state", _fake_load_state)
     monkeypatch.setattr(rest_mod, "list_saves", _fake_list_saves)
 
+    monkeypatch.setenv("RISUS_TOKEN", _TOKEN)
+
+    async def _instant_sleep(_t: float) -> None:
+        pass
+
+    monkeypatch.setattr(asyncio, "sleep", _instant_sleep)
+
 
 def make_test_app(pool: FakePool, lock_mgr: LockManager, conn_mgr: ConnectionManager) -> FastAPI:
     """Build a FastAPI app with no lifespan (pool pre-injected)."""
@@ -116,7 +126,7 @@ def test_get_saves_empty(app_client):
 
 def test_ws_connect_sends_state_and_presence(app_client):
     client, pool, _, _ = app_client
-    with client.websocket_connect("/ws/TestUser") as ws:
+    with client.websocket_connect(f"/ws/TestUser?token={_TOKEN}") as ws:
         state_frame = json.loads(ws.receive_text())
         presence_frame = json.loads(ws.receive_text())
     assert state_frame["type"] == "state"
@@ -127,7 +137,7 @@ def test_ws_connect_sends_state_and_presence(app_client):
 
 def test_ws_add_player_broadcasts_state(app_client):
     client, pool, _, _ = app_client
-    with client.websocket_connect("/ws/Alice") as ws:
+    with client.websocket_connect(f"/ws/Alice?token={_TOKEN}") as ws:
         ws.receive_text()  # state
         ws.receive_text()  # presence
         ws.send_text(json.dumps({"type": "add_player", "name": "Goblin", "cliche": "Bandit", "dice": 3}))
@@ -140,7 +150,7 @@ def test_ws_add_player_broadcasts_state(app_client):
 def test_ws_duplicate_player_sends_error(app_client):
     client, pool, _, _ = app_client
     pool._players["Goblin"] = {"name": "Goblin", "cliche": "Bandit", "dice": 3, "lost_dice": 0}
-    with client.websocket_connect("/ws/Alice") as ws:
+    with client.websocket_connect(f"/ws/Alice?token={_TOKEN}") as ws:
         ws.receive_text()  # state
         ws.receive_text()  # presence
         ws.send_text(json.dumps({"type": "add_player", "name": "Goblin"}))
@@ -157,7 +167,7 @@ def test_ws_lock_denied_when_held(app_client):
     )
     pool._players["Goblin"] = {"name": "Goblin", "cliche": "Bandit", "dice": 3, "lost_dice": 0}
 
-    with client.websocket_connect("/ws/Alice") as ws:
+    with client.websocket_connect(f"/ws/Alice?token={_TOKEN}") as ws:
         ws.receive_text()  # state
         ws.receive_text()  # presence
         ws.send_text(json.dumps({"type": "lock", "player_name": "Goblin"}))
@@ -170,7 +180,7 @@ def test_ws_lock_denied_when_held(app_client):
 def test_ws_lock_acquired_broadcasts(app_client):
     client, pool, _, _ = app_client
     pool._players["Goblin"] = {"name": "Goblin", "cliche": "Bandit", "dice": 3, "lost_dice": 0}
-    with client.websocket_connect("/ws/Alice") as ws:
+    with client.websocket_connect(f"/ws/Alice?token={_TOKEN}") as ws:
         ws.receive_text()  # state
         ws.receive_text()  # presence
         ws.send_text(json.dumps({"type": "lock", "player_name": "Goblin"}))
@@ -183,7 +193,7 @@ def test_ws_lock_acquired_broadcasts(app_client):
 def test_ws_switch_cliche_rejects_without_lock(app_client):
     client, pool, _, _ = app_client
     pool._players["Goblin"] = {"name": "Goblin", "cliche": "Bandit", "dice": 3, "lost_dice": 0}
-    with client.websocket_connect("/ws/Alice") as ws:
+    with client.websocket_connect(f"/ws/Alice?token={_TOKEN}") as ws:
         ws.receive_text()  # state
         ws.receive_text()  # presence
         ws.send_text(json.dumps({"type": "switch_cliche", "player_name": "Goblin", "cliche": "Wizard"}))

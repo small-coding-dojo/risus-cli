@@ -6,7 +6,7 @@ import time
 import pytest
 import websockets
 
-from tests.e2e.conftest import WS_URL
+from tests.e2e.conftest import TOKEN, WS_URL
 
 pytestmark = pytest.mark.e2e
 
@@ -30,8 +30,8 @@ async def _drain_initial(ws) -> None:
 
 @pytest.mark.asyncio
 async def test_state_propagates_within_one_second(risus_stack):
-    async with websockets.connect(f"{WS_URL}/ws/Alice") as alice:
-        async with websockets.connect(f"{WS_URL}/ws/Bob") as bob:
+    async with websockets.connect(f"{WS_URL}/ws/Alice?token={TOKEN}") as alice:
+        async with websockets.connect(f"{WS_URL}/ws/Bob?token={TOKEN}") as bob:
             await _drain_initial(alice)
             await _drain_initial(bob)
 
@@ -55,8 +55,8 @@ async def test_state_propagates_within_one_second(risus_stack):
 
 @pytest.mark.asyncio
 async def test_lock_blocks_concurrent_edit(risus_stack):
-    async with websockets.connect(f"{WS_URL}/ws/Alice2") as alice:
-        async with websockets.connect(f"{WS_URL}/ws/Bob2") as bob:
+    async with websockets.connect(f"{WS_URL}/ws/Alice2?token={TOKEN}") as alice:
+        async with websockets.connect(f"{WS_URL}/ws/Bob2?token={TOKEN}") as bob:
             await _drain_initial(alice)
             await _drain_initial(bob)
 
@@ -93,11 +93,11 @@ async def test_lock_blocks_concurrent_edit(risus_stack):
 
 @pytest.mark.asyncio
 async def test_duplicate_name_rejected(risus_stack):
-    async with websockets.connect(f"{WS_URL}/ws/UniqueUser") as _ws1:
+    async with websockets.connect(f"{WS_URL}/ws/UniqueUser?token={TOKEN}") as _ws1:
         await _drain_initial(_ws1)
 
         # Second connection with same name: server accepts then closes with 4409
-        ws2 = await websockets.connect(f"{WS_URL}/ws/UniqueUser")
+        ws2 = await websockets.connect(f"{WS_URL}/ws/UniqueUser?token={TOKEN}")
         try:
             # Drain any frames; expect close code 4409
             close_code = None

@@ -8,7 +8,7 @@ import time
 import pytest
 import websockets
 
-from tests.e2e.conftest import WS_URL, COMPOSE_FILE
+from tests.e2e.conftest import TOKEN, WS_URL, COMPOSE_FILE
 
 pytestmark = pytest.mark.e2e
 
@@ -56,7 +56,7 @@ def _restart_server():
 @pytest.mark.asyncio
 async def test_state_survives_server_restart(risus_stack):
     # Add players
-    async with websockets.connect(f"{WS_URL}/ws/RestartTester") as ws:
+    async with websockets.connect(f"{WS_URL}/ws/RestartTester?token={TOKEN}") as ws:
         await _drain_initial(ws)
         await ws.send(json.dumps({"type": "add_player", "name": "Survivor", "cliche": "Warrior", "dice": 5}))
         await _recv_until(ws, "state")
@@ -65,7 +65,7 @@ async def test_state_survives_server_restart(risus_stack):
     _restart_server()
 
     # Reconnect and verify state
-    async with websockets.connect(f"{WS_URL}/ws/RestartTester2") as ws:
+    async with websockets.connect(f"{WS_URL}/ws/RestartTester2?token={TOKEN}") as ws:
         state = await _recv_until(ws, "state")
         names = {p["name"] for p in state["players"]}
         assert "Survivor" in names, f"Expected Survivor in {names}"
@@ -73,8 +73,8 @@ async def test_state_survives_server_restart(risus_stack):
 
 @pytest.mark.asyncio
 async def test_named_save_load(risus_stack):
-    async with websockets.connect(f"{WS_URL}/ws/SaveUser") as alice:
-        async with websockets.connect(f"{WS_URL}/ws/LoadUser") as bob:
+    async with websockets.connect(f"{WS_URL}/ws/SaveUser?token={TOKEN}") as alice:
+        async with websockets.connect(f"{WS_URL}/ws/LoadUser?token={TOKEN}") as bob:
             await _drain_initial(alice)
             await _drain_initial(bob)
 

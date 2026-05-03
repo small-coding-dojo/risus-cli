@@ -20,8 +20,9 @@ services:
       dockerfile: docker/server.Dockerfile
     environment:
       DATABASE_URL: postgresql://risus:risus@db:5432/risus
+      RISUS_TOKEN: ${RISUS_TOKEN}
     ports:
-      - "8765:8765"
+      - "127.0.0.1:8765:8765"
     depends_on:
       db:
         condition: service_healthy
@@ -31,5 +32,16 @@ services:
       timeout: 3s
       retries: 20
 
+  caddy:
+    image: docker.io/library/caddy:2
+    network_mode: host
+    profiles:
+      - production
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    restart: unless-stopped
+
 volumes:
   dbdata: {}
+  caddy_data: {}

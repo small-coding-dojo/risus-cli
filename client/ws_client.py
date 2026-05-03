@@ -4,7 +4,6 @@ import json
 import queue
 import threading
 import time
-from typing import Optional
 
 import websockets
 
@@ -13,26 +12,32 @@ from .state import ClientState
 RECONNECT_DELAYS = [1, 2, 4, 8]
 
 
+class AuthError(Exception):
+    pass
+
+
 class WSClient:
     def __init__(self) -> None:
         self.state = ClientState()
         self._outbox: queue.Queue[str] = queue.Queue()
         self._inbox: queue.Queue[dict] = queue.Queue()
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         self._uri: str = ""
         self._stop = threading.Event()
 
-    def start(self, server: str, name: str, timeout: float = 10.0) -> None:
-        self._uri = f"ws://{server}/ws/{name}"
+    def start(self, server: str, name: str, token: str, timeout: float = 10.0) -> None:
+        scheme = "ws://" if ":" in server else "wss://"
+        self._uri = f"{scheme}{server}/ws/{name}?token={token}"
         self._stop.clear()
         self._thread = threading.Thread(target=self._run_loop, daemon=True)
         self._thread.start()
-        # Block until first state frame or timeout
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             try:
                 frame = self._inbox.get(timeout=0.2)
-                self._inbox.put(frame)  # put it back so callers can drain it
+                if frame.get("type") == "auth_failed":
+                    raise AuthError("token rejected by server")
+                self._inbox.put(frame)
                 return
             except queue.Empty:
                 pass
@@ -41,7 +46,7 @@ class WSClient:
     def send(self, payload: dict) -> None:
         self._outbox.put(json.dumps(payload))
 
-    def recv(self, timeout: float = 5.0) -> Optional[dict]:
+    def recv(self, timeout: float = 5.0) -> dict | None:
         try:
             return self._inbox.get(timeout=timeout)
         except queue.Empty:
@@ -72,13 +77,18 @@ class WSClient:
                         self._reader(ws),
                         self._writer(ws),
                     )
+            except websockets.exceptions.ConnectionClosedError as e:
+                if e.rcvd is not None and e.rcvd.code == 4401:
+                    self._inbox.put({"type": "auth_failed"})
+                    return
             except Exception:
-                if self._stop.is_set():
-                    break
-                self._inbox.put({"type": "disconnected"})
-                delay = RECONNECT_DELAYS[min(delay_idx, len(RECONNECT_DELAYS) - 1)]
-                delay_idx += 1
-                await asyncio.sleep(delay)
+                pass
+            if self._stop.is_set():
+                break
+            self._inbox.put({"type": "disconnected"})
+            delay = RECONNECT_DELAYS[min(delay_idx, len(RECONNECT_DELAYS) - 1)]
+            delay_idx += 1
+            await asyncio.sleep(delay)
 
     async def _reader(self, ws) -> None:
         async for raw in ws:
