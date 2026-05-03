@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": "gh pr create --title \"feat: secure session — token auth, encrypted transport, v1.0.0\" --body \"$(cat <<'EOF'\n## Summary\n\n- Server validates `RISUS_TOKEN` on every WebSocket connection; absent/wrong token closes with code 4401 after a uniform 3 s delay (no timing oracle)\n- Client appends `?token=` to URI, catches 4401, raises `AuthError`, re-prompts interactively\n- Token persisted in `risus.cfg` after successful connect; `--token` CLI arg overrides stored value\n- Scheme detection: `host:port` → `ws://`, bare hostname → `wss://` (TLS)\n- `load_battle()` URL fix: replace `wss://` before `ws://` (no double-replace bug)\n- `docker-compose.yml` binds server to `127.0.0.1`; Caddy TLS reverse proxy added (production profile)\n- Version bumped to 1.0.0\n- CONTRIBUTING.md: setup section, RISUS_TOKEN docs, Hetzner deployment guide\n\n## Hand-off checklist\n\n- [x] `pytest tests/unit -q` — 77 passed\n- [x] `PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman RISUS_TOKEN=test-token-for-e2e pytest tests/e2e -m e2e -q` — 11 passed\n- [x] `curl -fsS http://localhost:8765/healthz` returns `{\"ok\":true}`\n- [x] Two clients (VM + macOS via SSH tunnel) connected simultaneously, saw same state, lock indicator worked, lock denial worked\n- [x] Wrong token rejected with re-prompt; correct token connects\n\n## Merge note\n\n**Please squash-merge** — earlier commits on this branch contain a personal domain in spec/test files that has since been replaced. Squash merge drops that history.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\" --base main 2>&1",
+    "testCommand": ".venv/bin/pytest tests/unit -q 2>&1 && .venv/bin/ruff check risus.py client/ws_client.py 2>&1",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -157,8 +157,8 @@
   "hotPaths": [
     {
       "path": "risus.py",
-      "accessCount": 45,
-      "lastAccessed": 1777805538064,
+      "accessCount": 50,
+      "lastAccessed": 1777829306763,
       "type": "file"
     },
     {
@@ -186,6 +186,12 @@
       "type": "file"
     },
     {
+      "path": "client/ws_client.py",
+      "accessCount": 20,
+      "lastAccessed": 1777829327554,
+      "type": "file"
+    },
+    {
       "path": "specs/004-secure-session/research.md",
       "accessCount": 18,
       "lastAccessed": 1777793585167,
@@ -193,8 +199,8 @@
     },
     {
       "path": "tests/unit/test_startup.py",
-      "accessCount": 16,
-      "lastAccessed": 1777805289726,
+      "accessCount": 17,
+      "lastAccessed": 1777829168338,
       "type": "file"
     },
     {
@@ -207,12 +213,6 @@
       "path": "specs/004-secure-session/tasks.md",
       "accessCount": 14,
       "lastAccessed": 1777793571549,
-      "type": "file"
-    },
-    {
-      "path": "client/ws_client.py",
-      "accessCount": 14,
-      "lastAccessed": 1777805490974,
       "type": "file"
     },
     {
@@ -234,6 +234,12 @@
       "type": "file"
     },
     {
+      "path": "tests/unit/test_token_auth.py",
+      "accessCount": 11,
+      "lastAccessed": 1777829168275,
+      "type": "file"
+    },
+    {
       "path": "specs/003-standalone-client/tasks.md",
       "accessCount": 10,
       "lastAccessed": 1777749596432,
@@ -252,9 +258,15 @@
       "type": "file"
     },
     {
-      "path": "tests/unit/test_token_auth.py",
+      "path": "client/config.py",
       "accessCount": 10,
-      "lastAccessed": 1777805518345,
+      "lastAccessed": 1777827349702,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 10,
+      "lastAccessed": 1777829267614,
       "type": "file"
     },
     {
@@ -285,12 +297,6 @@
       "path": "specs/004-secure-session/data-model.md",
       "accessCount": 9,
       "lastAccessed": 1777793585576,
-      "type": "file"
-    },
-    {
-      "path": "client/config.py",
-      "accessCount": 9,
-      "lastAccessed": 1777805374176,
       "type": "file"
     },
     {
@@ -360,9 +366,9 @@
       "type": "file"
     },
     {
-      "path": "pyproject.toml",
+      "path": "PLAYER.md",
       "accessCount": 5,
-      "lastAccessed": 1777809840139,
+      "lastAccessed": 1777829220442,
       "type": "file"
     },
     {
@@ -375,12 +381,6 @@
       "path": "specs/003-standalone-client/checklists/requirements.md",
       "accessCount": 3,
       "lastAccessed": 1777744903324,
-      "type": "file"
-    },
-    {
-      "path": "PLAYER.md",
-      "accessCount": 3,
-      "lastAccessed": 1777755254097,
       "type": "file"
     },
     {
@@ -402,15 +402,15 @@
       "type": "file"
     },
     {
-      "path": "specs/003-standalone-client/contracts/artifact-naming.md",
-      "accessCount": 2,
-      "lastAccessed": 1777749611630,
+      "path": "risus.cfg.example",
+      "accessCount": 3,
+      "lastAccessed": 1777827879021,
       "type": "file"
     },
     {
-      "path": "risus.cfg.example",
+      "path": "specs/003-standalone-client/contracts/artifact-naming.md",
       "accessCount": 2,
-      "lastAccessed": 1777750535113,
+      "lastAccessed": 1777749611630,
       "type": "file"
     },
     {
