@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": "PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman RISUS_TOKEN=testtoken .venv/bin/pytest tests/e2e -m e2e -q 2>&1",
+    "testCommand": "gh pr create --title \"feat: secure session — token auth, encrypted transport, v1.0.0\" --body \"$(cat <<'EOF'\n## Summary\n\n- Server validates `RISUS_TOKEN` on every WebSocket connection; absent/wrong token closes with code 4401 after a uniform 3 s delay (no timing oracle)\n- Client appends `?token=` to URI, catches 4401, raises `AuthError`, re-prompts interactively\n- Token persisted in `risus.cfg` after successful connect; `--token` CLI arg overrides stored value\n- Scheme detection: `host:port` → `ws://`, bare hostname → `wss://` (TLS)\n- `load_battle()` URL fix: replace `wss://` before `ws://` (no double-replace bug)\n- `docker-compose.yml` binds server to `127.0.0.1`; Caddy TLS reverse proxy added (production profile)\n- Version bumped to 1.0.0\n- CONTRIBUTING.md: setup section, RISUS_TOKEN docs, Hetzner deployment guide\n\n## Hand-off checklist\n\n- [x] `pytest tests/unit -q` — 77 passed\n- [x] `PATH=$PWD/.venv/bin:$PATH CONTAINER_ENGINE=podman RISUS_TOKEN=test-token-for-e2e pytest tests/e2e -m e2e -q` — 11 passed\n- [x] `curl -fsS http://localhost:8765/healthz` returns `{\"ok\":true}`\n- [x] Two clients (VM + macOS via SSH tunnel) connected simultaneously, saw same state, lock indicator worked, lock denial worked\n- [x] Wrong token rejected with re-prompt; correct token connects\n\n## Merge note\n\n**Please squash-merge** — earlier commits on this branch contain a personal domain in spec/test files that has since been replaced. Squash merge drops that history.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\" --base main 2>&1",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -228,6 +228,12 @@
       "type": "file"
     },
     {
+      "path": "CONTRIBUTING.md",
+      "accessCount": 11,
+      "lastAccessed": 1777811756662,
+      "type": "file"
+    },
+    {
       "path": "specs/003-standalone-client/tasks.md",
       "accessCount": 10,
       "lastAccessed": 1777749596432,
@@ -306,6 +312,12 @@
       "type": "file"
     },
     {
+      "path": "specs/004-secure-session/quickstart.md",
+      "accessCount": 7,
+      "lastAccessed": 1777811757100,
+      "type": "file"
+    },
+    {
       "path": "docs/features/secure-session/concept.md",
       "accessCount": 6,
       "lastAccessed": 1777790692529,
@@ -330,12 +342,6 @@
       "type": "file"
     },
     {
-      "path": "specs/004-secure-session/quickstart.md",
-      "accessCount": 5,
-      "lastAccessed": 1777792667335,
-      "type": "file"
-    },
-    {
       "path": "tests/unit/test_ws_protocol.py",
       "accessCount": 5,
       "lastAccessed": 1777794140867,
@@ -354,6 +360,12 @@
       "type": "file"
     },
     {
+      "path": "pyproject.toml",
+      "accessCount": 5,
+      "lastAccessed": 1777809840139,
+      "type": "file"
+    },
+    {
       "path": "specs/004-secure-session/checklists/requirements.md",
       "accessCount": 4,
       "lastAccessed": 1777791778635,
@@ -363,12 +375,6 @@
       "path": "specs/003-standalone-client/checklists/requirements.md",
       "accessCount": 3,
       "lastAccessed": 1777744903324,
-      "type": "file"
-    },
-    {
-      "path": "pyproject.toml",
-      "accessCount": 3,
-      "lastAccessed": 1777750534618,
       "type": "file"
     },
     {
@@ -429,12 +435,6 @@
       "path": ".specify/templates/plan-template.md",
       "accessCount": 1,
       "lastAccessed": 1777738988998,
-      "type": "file"
-    },
-    {
-      "path": "CONTRIBUTING.md",
-      "accessCount": 1,
-      "lastAccessed": 1777738990586,
       "type": "file"
     },
     {
