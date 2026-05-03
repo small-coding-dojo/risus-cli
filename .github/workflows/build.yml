@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main, 003-standalone-client]
+    branches: [main, 003-standalone-client, 005-macos-signed-release]
   pull_request:
-    branches: [main, 003-standalone-client]
+    branches: [main, 003-standalone-client, 005-macos-signed-release]
 
 jobs:
   build:
