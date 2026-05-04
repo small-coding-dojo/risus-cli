@@ -22,6 +22,9 @@ jobs:
           - os: windows-latest
             artifact: risus-windows-x86_64.exe
 
+    env:
+      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+
     steps:
       - uses: actions/checkout@v6
 
@@ -44,15 +47,25 @@ jobs:
         run: Rename-Item dist\risus.exe ${{ matrix.artifact }}
         shell: pwsh
 
+      - name: Assert signing secrets
+        if: runner.os == 'macOS' && github.ref_type == 'tag'
+        run: |
+          if [ -z "$APPLE_CERTIFICATE" ]; then
+            echo "ERROR: APPLE_CERTIFICATE secret is not configured. Refusing to publish an unsigned release artifact."
+            echo "Configure the 6 Apple signing secrets in repository Settings → Secrets before pushing a release tag."
+            echo "See specs/005-macos-signed-release/quickstart.md for setup instructions."
+            exit 1
+          fi
+
       - name: Import signing certificate
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         uses: apple-actions/import-codesign-certs@v7
         with:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Sign binary
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         run: |
           codesign --force --verbose --timestamp \
             --sign "$APPLE_SIGNING_IDENTITY" \
@@ -63,11 +76,14 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
 
       - name: Package signed binary
-        if: runner.os == 'macOS'
-        run: ditto -c -k --keepParent dist/risus-macos-arm64 dist/risus-macos-arm64.zip
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
+        run: |
+          mkdir -p /tmp/risus-macos-arm64
+          cp dist/risus-macos-arm64 /tmp/risus-macos-arm64/
+          ditto -c -k --keepParent /tmp/risus-macos-arm64 dist/risus-macos-arm64.zip
 
       - name: Notarize
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         timeout-minutes: 15
         run: |
           echo "$APPLE_API_KEY_CONTENT" | base64 --decode > /tmp/apple_api_key.p8
@@ -82,21 +98,21 @@ jobs:
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
 
       - name: Clean up API key
-        if: always() && runner.os == 'macOS'
+        if: always() && runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         run: rm -f /tmp/apple_api_key.p8
 
       - name: Verify signature
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         run: codesign --verify --deep --strict --verbose=2 dist/risus-macos-arm64
 
-      - name: Compute checksum (macOS)
-        if: runner.os == 'macOS'
+      - name: Compute checksum (macOS, signed)
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         run: |
           cd dist
           sha256sum risus-macos-arm64.zip > risus-macos-arm64.zip.sha256
 
-      - name: Compute checksum (Linux)
-        if: runner.os == 'Linux'
+      - name: Compute checksum (non-signed)
+        if: runner.os != 'Windows' && (runner.os != 'macOS' || env.APPLE_CERTIFICATE == '')
         run: |
           cd dist
           sha256sum ${{ matrix.artifact }} > ${{ matrix.artifact }}.sha256
@@ -108,8 +124,8 @@ jobs:
           "$hash  ${{ matrix.artifact }}" | Out-File -FilePath dist\${{ matrix.artifact }}.sha256 -Encoding ascii
         shell: pwsh
 
-      - name: Upload artifact (macOS)
-        if: runner.os == 'macOS'
+      - name: Upload artifact (macOS, signed)
+        if: runner.os == 'macOS' && env.APPLE_CERTIFICATE != ''
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
@@ -118,7 +134,7 @@ jobs:
             dist/risus-macos-arm64.zip.sha256
 
       - name: Upload artifact
-        if: runner.os != 'macOS'
+        if: runner.os != 'macOS' || env.APPLE_CERTIFICATE == ''
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
