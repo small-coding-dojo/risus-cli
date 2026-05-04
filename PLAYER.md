@@ -19,13 +19,7 @@ operating system:
 chmod +x risus-linux-x86_64   # replace with your filename
 ```
 
-**macOS note**: On first run macOS may block the app because it is not
-notarized. To allow it:
-
-1. Try to run it once — macOS shows a security warning and blocks it.
-2. Open **System Settings → Privacy & Security**.
-3. Scroll down to the blocked app and click **Allow Anyway**.
-4. Run the binary again — it will launch.
+**macOS note**: The binary is notarized. Gatekeeper allows it on first run without any manual steps.
 
 ## 3. Run
 
@@ -81,6 +75,6 @@ A template file `risus.cfg.example` is included in the release — copy it to
 | `Connection to … failed` | Check that the server is running and the address is correct |
 | Menu appears instantly, no players listed, no delay | Client did not connect. Check `risus.cfg` exists in the same folder as the binary. If the server uses TLS (e.g. `risus.example.com`), the address must have **no port** — a `host:port` address forces an unencrypted connection |
 | Permission denied (Unix) | Run `chmod +x <filename>` first |
-| macOS blocks the app | Follow Step 2 above |
+| macOS blocks the app | Binary is notarized — if blocked, open System Settings → Privacy & Security and click Allow Anyway |
 | Windows SmartScreen warning | Click **More info → Run anyway** |
 | Slow startup (~2–4 s) | Normal — binary self-extracts on first launch |

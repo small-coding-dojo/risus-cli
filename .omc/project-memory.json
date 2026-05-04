@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1777804471603,
+  "lastScanned": 1777897422303,
   "projectRoot": "/home/galadriel/Documents/Cline/risus-cli",
   "techStack": {
     "languages": [
@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": ".venv/bin/pytest tests/unit -q 2>&1 && .venv/bin/ruff check risus.py client/ws_client.py 2>&1",
+    "testCommand": "pytest",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -59,7 +59,7 @@
       "path": "__pycache__",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1777804471593,
+      "lastAccessed": 1777897422278,
       "keyFiles": [
         "risus.cpython-312.pyc"
       ]
@@ -67,10 +67,11 @@
     "build": {
       "path": "build",
       "purpose": "Build output",
-      "fileCount": 2,
-      "lastAccessed": 1777804471596,
+      "fileCount": 3,
+      "lastAccessed": 1777897422295,
       "keyFiles": [
         "README.md",
+        "entitlements.plist",
         "risus.spec"
       ]
     },
@@ -78,7 +79,7 @@
       "path": "client",
       "purpose": null,
       "fileCount": 4,
-      "lastAccessed": 1777804471600,
+      "lastAccessed": 1777897422300,
       "keyFiles": [
         "__init__.py",
         "config.py",
@@ -90,7 +91,7 @@
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 1,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "risus"
       ]
@@ -99,7 +100,7 @@
       "path": "docker",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "server.Dockerfile"
       ]
@@ -108,14 +109,14 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 0,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": []
     },
     "risus_cli.egg-info": {
       "path": "risus_cli.egg-info",
       "purpose": null,
       "fileCount": 5,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "PKG-INFO",
         "SOURCES.txt",
@@ -128,7 +129,7 @@
       "path": "server",
       "purpose": null,
       "fileCount": 9,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "__init__.py",
         "app.py",
@@ -141,14 +142,14 @@
       "path": "specs",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422302,
       "keyFiles": []
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 1,
-      "lastAccessed": 1777804471602,
+      "lastAccessed": 1777897422302,
       "keyFiles": [
         "__init__.py"
       ]
@@ -169,26 +170,26 @@
     },
     {
       "path": "AGENTS.md",
-      "accessCount": 22,
-      "lastAccessed": 1777812713591,
+      "accessCount": 29,
+      "lastAccessed": 1777869979110,
       "type": "file"
     },
     {
       "path": ".specify/memory/constitution.md",
+      "accessCount": 23,
+      "lastAccessed": 1777831335578,
+      "type": "file"
+    },
+    {
+      "path": "client/ws_client.py",
       "accessCount": 21,
-      "lastAccessed": 1777812763030,
+      "lastAccessed": 1777829969586,
       "type": "file"
     },
     {
       "path": "specs/003-standalone-client/spec.md",
       "accessCount": 20,
       "lastAccessed": 1777749597169,
-      "type": "file"
-    },
-    {
-      "path": "client/ws_client.py",
-      "accessCount": 20,
-      "lastAccessed": 1777829327554,
       "type": "file"
     },
     {
@@ -216,9 +217,21 @@
       "type": "file"
     },
     {
+      "path": "specs/003-standalone-client/quickstart.md",
+      "accessCount": 14,
+      "lastAccessed": 1777870035001,
+      "type": "file"
+    },
+    {
       "path": "specs/003-standalone-client/plan.md",
       "accessCount": 13,
       "lastAccessed": 1777750552764,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 13,
+      "lastAccessed": 1777867903357,
       "type": "file"
     },
     {
@@ -237,6 +250,18 @@
       "path": "tests/unit/test_token_auth.py",
       "accessCount": 11,
       "lastAccessed": 1777829168275,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 11,
+      "lastAccessed": 1777831479114,
+      "type": "file"
+    },
+    {
+      "path": "PLAYER.md",
+      "accessCount": 11,
+      "lastAccessed": 1777870046991,
       "type": "file"
     },
     {
@@ -264,33 +289,15 @@
       "type": "file"
     },
     {
-      "path": "pyproject.toml",
-      "accessCount": 10,
-      "lastAccessed": 1777829267614,
-      "type": "file"
-    },
-    {
       "path": "specs/003-standalone-client/data-model.md",
       "accessCount": 9,
       "lastAccessed": 1777748689564,
       "type": "file"
     },
     {
-      "path": "specs/003-standalone-client/quickstart.md",
-      "accessCount": 9,
-      "lastAccessed": 1777749902416,
-      "type": "file"
-    },
-    {
       "path": "README.md",
       "accessCount": 9,
       "lastAccessed": 1777754918429,
-      "type": "file"
-    },
-    {
-      "path": "CLAUDE.md",
-      "accessCount": 9,
-      "lastAccessed": 1777792045335,
       "type": "file"
     },
     {
@@ -366,15 +373,21 @@
       "type": "file"
     },
     {
-      "path": "PLAYER.md",
+      "path": ".specify/feature.json",
       "accessCount": 5,
-      "lastAccessed": 1777829220442,
+      "lastAccessed": 1777830776429,
       "type": "file"
     },
     {
       "path": "specs/004-secure-session/checklists/requirements.md",
       "accessCount": 4,
       "lastAccessed": 1777791778635,
+      "type": "file"
+    },
+    {
+      "path": ".specify/templates/tasks-template.md",
+      "accessCount": 4,
+      "lastAccessed": 1777831528588,
       "type": "file"
     },
     {
@@ -387,18 +400,6 @@
       "path": ".specify/templates/spec-template.md",
       "accessCount": 3,
       "lastAccessed": 1777791070410,
-      "type": "file"
-    },
-    {
-      "path": ".specify/feature.json",
-      "accessCount": 3,
-      "lastAccessed": 1777791146829,
-      "type": "file"
-    },
-    {
-      "path": ".specify/templates/tasks-template.md",
-      "accessCount": 3,
-      "lastAccessed": 1777792667551,
       "type": "file"
     },
     {
