@@ -17,13 +17,10 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: risus-linux-x86_64
-            binary: dist/risus
           - os: macos-latest
             artifact: risus-macos-arm64
-            binary: dist/risus
           - os: windows-latest
             artifact: risus-windows-x86_64.exe
-            binary: dist/risus.exe
 
     steps:
       - uses: actions/checkout@v6
