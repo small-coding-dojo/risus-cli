@@ -103,6 +103,51 @@ def test_input_with_refresh_redraws_on_timeout():
 
 
 # ---------------------------------------------------------------------------
+# T007b — _input_with_refresh calls redraw kwarg, not show_state, when provided
+# ---------------------------------------------------------------------------
+
+def test_input_with_refresh_calls_redraw_kwarg():
+    """When redraw callable passed, it is called; show_state is NOT called."""
+    import sys
+
+    ws_stub = MagicMock()
+    with patch.dict(sys.modules, {"websockets": ws_stub,
+                                   "websockets.exceptions": ws_stub,
+                                   "client.ws_client": MagicMock()}):
+        import importlib
+        import risus as _risus_mod
+        importlib.reload(_risus_mod)
+
+    cs = ClientState()
+    cs.apply({"type": "presence", "clients": ["TestUser", "OtherUser"]})  # sets update_event
+    assert cs.update_event.is_set()
+
+    mock_ws_client = MagicMock()
+    mock_ws_client.state = cs
+
+    select_results = [
+        ([], [], []),           # timeout → triggers redraw
+        ([sys.stdin], [], []),  # stdin ready → read line
+    ]
+
+    mock_redraw = MagicMock()
+
+    with patch.object(_risus_mod, "_client", mock_ws_client), \
+         patch.object(_risus_mod, "show_state") as mock_show, \
+         patch.object(_risus_mod, "select") as mock_select_mod, \
+         patch("sys.stdin") as mock_stdin:
+        mock_select_mod.select.side_effect = select_results
+        mock_stdin.readline.return_value = "2\n"
+
+        result = _risus_mod._input_with_refresh("> ", redraw=mock_redraw)
+
+    assert result == "2"
+    mock_redraw.assert_called_once()
+    mock_show.assert_not_called()
+    assert not cs.update_event.is_set()
+
+
+# ---------------------------------------------------------------------------
 # T011 — lock_acquired frame sets update_event
 # ---------------------------------------------------------------------------
 

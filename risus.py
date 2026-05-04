@@ -52,7 +52,7 @@ def show_state():
     print()
 
 
-def _input_with_refresh(prompt: str) -> str:
+def _input_with_refresh(prompt: str, redraw=None) -> str:
     """Synchronous input with periodic display refresh on state updates.
 
     Replaces input() at the top-level menu only. Uses select.select with a
@@ -60,6 +60,10 @@ def _input_with_refresh(prompt: str) -> str:
     the background WS reader. Blocks until a complete line is returned —
     callers see no difference from input(). Terminal canonical mode keeps
     partial keystrokes in the line buffer; they survive the redraw intact.
+
+    redraw: optional callable invoked on update_event. When provided it is
+    responsible for clearing the screen and printing the full UI. When None,
+    show_state() is called as a fallback.
 
     Permitted by constitution v1.1.1: synchronous stdlib-only polling wrapper,
     no external dependencies, blocks until a complete line is returned.
@@ -74,7 +78,10 @@ def _input_with_refresh(prompt: str) -> str:
             if _ws().state.update_event.is_set():
                 _ws().state.update_event.clear()
                 sys.stdout.write("\n")
-                show_state()
+                if redraw is not None:
+                    redraw()
+                else:
+                    show_state()
                 sys.stdout.write(prompt)
                 sys.stdout.flush()
     except io.UnsupportedOperation:
@@ -344,7 +351,7 @@ def main():
     token = connect_or_die(server, name, token)
     atexit.register(client.config.write_config, base_dir, server, name, token)
 
-    while True:
+    def _redraw_main():
         clear()
         show_state()
         print("  1. Add player")
@@ -354,7 +361,10 @@ def main():
         print("  5. Load")
         print("  6. Quit")
         print()
-        choice = _input_with_refresh("> ")
+
+    while True:
+        _redraw_main()
+        choice = _input_with_refresh("> ", redraw=_redraw_main)
 
         if choice == "1":
             add_player()
