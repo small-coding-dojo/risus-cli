@@ -118,10 +118,10 @@ constitution's "Development Workflow" section.
 
 | type | key fields | notes |
 | --- | --- | --- |
-| `state` | `players: [{name, cliche, dice, lost_dice}]` | Full sync |
-| `presence` | `clients: [names]` | Connected users |
-| `lock_acquired` | `player_name, locked_by` | Broadcast |
-| `lock_released` | `player_name` | Broadcast |
+| `state` | `players: [{name, cliche, dice, lost_dice}]` | Full sync; sets `ClientState.update_event` |
+| `presence` | `clients: [names]` | Connected users; sets `ClientState.update_event` |
+| `lock_acquired` | `player_name, locked_by` | Broadcast; sets `ClientState.update_event` |
+| `lock_released` | `player_name` | Broadcast; sets `ClientState.update_event` |
 | `lock_denied` | `player_name, locked_by` | Caller only |
 | `error` | `message` | Caller only |
 

@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": "pytest",
+    "testCommand": "pytest tests/unit -q 2>&1",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -158,8 +158,8 @@
   "hotPaths": [
     {
       "path": "risus.py",
-      "accessCount": 50,
-      "lastAccessed": 1777829306763,
+      "accessCount": 56,
+      "lastAccessed": 1777916869248,
       "type": "file"
     },
     {
@@ -170,20 +170,20 @@
     },
     {
       "path": "AGENTS.md",
-      "accessCount": 29,
-      "lastAccessed": 1777869979110,
+      "accessCount": 30,
+      "lastAccessed": 1777916704724,
       "type": "file"
     },
     {
       "path": ".specify/memory/constitution.md",
-      "accessCount": 23,
-      "lastAccessed": 1777831335578,
+      "accessCount": 24,
+      "lastAccessed": 1777916715339,
       "type": "file"
     },
     {
       "path": "client/ws_client.py",
-      "accessCount": 21,
-      "lastAccessed": 1777829969586,
+      "accessCount": 22,
+      "lastAccessed": 1777916405389,
       "type": "file"
     },
     {
