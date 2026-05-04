@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1777804471603,
+  "lastScanned": 1777897422303,
   "projectRoot": "/home/galadriel/Documents/Cline/risus-cli",
   "techStack": {
     "languages": [
@@ -30,7 +30,7 @@
   },
   "build": {
     "buildCommand": null,
-    "testCommand": ".venv/bin/pytest tests/unit -q 2>&1",
+    "testCommand": "pytest",
     "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
@@ -59,7 +59,7 @@
       "path": "__pycache__",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1777804471593,
+      "lastAccessed": 1777897422278,
       "keyFiles": [
         "risus.cpython-312.pyc"
       ]
@@ -67,10 +67,11 @@
     "build": {
       "path": "build",
       "purpose": "Build output",
-      "fileCount": 2,
-      "lastAccessed": 1777804471596,
+      "fileCount": 3,
+      "lastAccessed": 1777897422295,
       "keyFiles": [
         "README.md",
+        "entitlements.plist",
         "risus.spec"
       ]
     },
@@ -78,7 +79,7 @@
       "path": "client",
       "purpose": null,
       "fileCount": 4,
-      "lastAccessed": 1777804471600,
+      "lastAccessed": 1777897422300,
       "keyFiles": [
         "__init__.py",
         "config.py",
@@ -90,7 +91,7 @@
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 1,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "risus"
       ]
@@ -99,7 +100,7 @@
       "path": "docker",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "server.Dockerfile"
       ]
@@ -108,14 +109,14 @@
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 0,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": []
     },
     "risus_cli.egg-info": {
       "path": "risus_cli.egg-info",
       "purpose": null,
       "fileCount": 5,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "PKG-INFO",
         "SOURCES.txt",
@@ -128,7 +129,7 @@
       "path": "server",
       "purpose": null,
       "fileCount": 9,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422301,
       "keyFiles": [
         "__init__.py",
         "app.py",
@@ -141,14 +142,14 @@
       "path": "specs",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1777804471601,
+      "lastAccessed": 1777897422302,
       "keyFiles": []
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 1,
-      "lastAccessed": 1777804471602,
+      "lastAccessed": 1777897422302,
       "keyFiles": [
         "__init__.py"
       ]
