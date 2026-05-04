@@ -1,3 +1,6 @@
+# MCP secrets
+.mcp.json
+
 # Oh My Claude Code state - block all, then carve out what to share
 !.omc/
 .omc/*
