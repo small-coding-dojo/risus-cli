@@ -17,5 +17,5 @@ Do not duplicate rules here. Update the constitution or AGENTS.md instead.
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/005-macos-signed-release/plan.md`.
+`specs/007-client-screen-sync/plan.md`.
 <!-- SPECKIT END -->

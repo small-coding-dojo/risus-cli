@@ -39,8 +39,12 @@ per-user authentication or user management, no multi-battle support — these
 are permanently out of scope per the PRD. A single shared-secret token
 (`RISUS_TOKEN`) for connection authentication is permitted (see
 `docs/features/secure-session/`). Menu UX (options 1–6, labels, prompts,
-ordering) MUST NOT change. `input()` calls MUST remain synchronous; no
-`prompt_toolkit` or async input libraries may be introduced.
+ordering) MUST NOT change. Input from the operator MUST remain synchronous
+from the caller's perspective; no `prompt_toolkit` or async input libraries
+may be introduced. Replacing the `input()` builtin with a synchronous
+stdlib-only polling wrapper (e.g., `select.select` with a timeout) is
+permitted when required for display refresh, provided the wrapper introduces
+no external dependencies and blocks until a complete line is returned.
 
 **Rationale**: Scope creep breaks the PRD contract and multi-player UX
 assumptions. Keep modifications, configuration, and options at the absolute
@@ -128,4 +132,4 @@ Complexity additions MUST be justified in the plan's Complexity Tracking
 table. Refer to `AGENTS.md` for runtime agent guidance and the hand-off
 checklist.
 
-**Version**: 1.1.0 | **Ratified**: 2026-05-02 | **Last Amended**: 2026-05-03
+**Version**: 1.1.1 | **Ratified**: 2026-05-02 | **Last Amended**: 2026-05-04
