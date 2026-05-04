@@ -18,6 +18,7 @@ class ClientState:
         self.players: list[PlayerSnapshot] = []
         self.presence: list[str] = []
         self.locks: dict[str, str] = {}  # player_name -> display_name of holder
+        self.update_event = threading.Event()
 
     def apply(self, frame: dict) -> None:
         msg_type = frame.get("type", "")
@@ -38,6 +39,9 @@ class ClientState:
                 self.locks[frame["player_name"]] = frame["locked_by"]
             elif msg_type == "lock_released":
                 self.locks.pop(frame.get("player_name", ""), None)
+            else:
+                return
+        self.update_event.set()
 
     def snapshot_players(self) -> list[PlayerSnapshot]:
         with self._lock:

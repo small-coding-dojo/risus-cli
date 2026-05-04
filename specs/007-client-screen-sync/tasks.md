@@ -26,8 +26,8 @@ description: "Task list for automatic client screen refresh"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T001 Add `update_event: threading.Event` field initialized in `ClientState.__init__()` in `client/state.py`
-- [ ] T002 Call `self.update_event.set()` at the end of every branch in `ClientState.apply()` (after `state`, `presence`, `lock_acquired`, `lock_released` updates) in `client/state.py`
+- [x] T001 Add `update_event: threading.Event` field initialized in `ClientState.__init__()` in `client/state.py`
+- [x] T002 Call `self.update_event.set()` at the end of every branch in `ClientState.apply()` (after `state`, `presence`, `lock_acquired`, `lock_released` updates) in `client/state.py`
 
 **Checkpoint**: `ClientState.update_event` exists and is set by every incoming frame type. Unit tests can now be written.
 
@@ -41,17 +41,17 @@ description: "Task list for automatic client screen refresh"
 
 ### Tests for User Story 1
 
-- [ ] T003 [P] [US1] Write unit test `test_apply_state_sets_update_event` — assert event is set after `state` frame in `tests/unit/test_state_refresh.py`
-- [ ] T004 [P] [US1] Write unit test `test_apply_presence_sets_update_event` — assert event is set after `presence` frame in `tests/unit/test_state_refresh.py`
-- [ ] T005 [P] [US1] Write unit test `test_update_event_starts_clear` — assert fresh `ClientState()` has event not set in `tests/unit/test_state_refresh.py`
-- [ ] T006 [P] [US1] Write unit test `test_rapid_apply_no_updates_dropped` — call `apply()` with 10 distinct `state` frames in rapid succession; assert final `ClientState.players` reflects last frame and `update_event` is set; validates SC-003 in `tests/unit/test_state_refresh.py`
-- [ ] T007 [P] [US1] Write unit test `test_input_with_refresh_redraws_on_timeout` — mock `select.select` to return timeout on first call and ready-stdin on second; mock `show_state()`; assert `show_state()` called once and prompt reprinted in `tests/unit/test_state_refresh.py`
+- [x] T003 [P] [US1] Write unit test `test_apply_state_sets_update_event` — assert event is set after `state` frame in `tests/unit/test_state_refresh.py`
+- [x] T004 [P] [US1] Write unit test `test_apply_presence_sets_update_event` — assert event is set after `presence` frame in `tests/unit/test_state_refresh.py`
+- [x] T005 [P] [US1] Write unit test `test_update_event_starts_clear` — assert fresh `ClientState()` has event not set in `tests/unit/test_state_refresh.py`
+- [x] T006 [P] [US1] Write unit test `test_rapid_apply_no_updates_dropped` — call `apply()` with 10 distinct `state` frames in rapid succession; assert final `ClientState.players` reflects last frame and `update_event` is set; validates SC-003 in `tests/unit/test_state_refresh.py`
+- [x] T007 [P] [US1] Write unit test `test_input_with_refresh_redraws_on_timeout` — mock `select.select` to return timeout on first call and ready-stdin on second; mock `show_state()`; assert `show_state()` called once and prompt reprinted in `tests/unit/test_state_refresh.py`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Add `_input_with_refresh(prompt: str) -> str` helper to `risus.py` — uses `select.select([sys.stdin], [], [], 1.0)` loop; on timeout checks `_ws().state.update_event.is_set()`; if set: clears event, prints newline, calls `show_state()`, reprints prompt; returns stripped line when stdin is ready. Add inline comment citing constitution v1.1.1 synchronous-wrapper exemption.
-- [ ] T009 [US1] Replace the single `choice = input("> ")` call inside the top-level menu loop in `main()` with `choice = _input_with_refresh("> ")` in `risus.py` (all other `input()` calls in submenus are left unchanged)
-- [ ] T010 [US1] Run unit tests and confirm T003–T007 pass: `pytest tests/unit/test_state_refresh.py -v`
+- [x] T008 [US1] Add `_input_with_refresh(prompt: str) -> str` helper to `risus.py` — uses `select.select([sys.stdin], [], [], 1.0)` loop; on timeout checks `_ws().state.update_event.is_set()`; if set: clears event, prints newline, calls `show_state()`, reprints prompt; returns stripped line when stdin is ready. Add inline comment citing constitution v1.1.1 synchronous-wrapper exemption.
+- [x] T009 [US1] Replace the single `choice = input("> ")` call inside the top-level menu loop in `main()` with `choice = _input_with_refresh("> ")` in `risus.py` (all other `input()` calls in submenus are left unchanged)
+- [x] T010 [US1] Run unit tests and confirm T003–T007 pass: `pytest tests/unit/test_state_refresh.py -v`
 
 **Checkpoint**: US1 fully functional. Client A auto-refreshes when client B modifies state. All US1 tests green.
 
@@ -67,9 +67,9 @@ description: "Task list for automatic client screen refresh"
 
 ### Tests for User Story 2
 
-- [ ] T011 [P] [US2] Write unit test `test_apply_lock_acquired_sets_update_event` in `tests/unit/test_state_refresh.py`
-- [ ] T012 [P] [US2] Write unit test `test_apply_lock_released_sets_update_event` in `tests/unit/test_state_refresh.py`
-- [ ] T013 [US2] Run unit tests and confirm T011–T012 pass: `pytest tests/unit/test_state_refresh.py -v`
+- [x] T011 [P] [US2] Write unit test `test_apply_lock_acquired_sets_update_event` in `tests/unit/test_state_refresh.py`
+- [x] T012 [P] [US2] Write unit test `test_apply_lock_released_sets_update_event` in `tests/unit/test_state_refresh.py`
+- [x] T013 [US2] Run unit tests and confirm T011–T012 pass: `pytest tests/unit/test_state_refresh.py -v`
 
 **Checkpoint**: US2 verified. Lock events auto-refresh client display. All US1 + US2 tests green.
 
@@ -85,8 +85,8 @@ description: "Task list for automatic client screen refresh"
 
 ### Tests for User Story 3
 
-- [ ] T014 [US3] Write unit test `test_update_event_cleared_after_check` — assert that after `update_event.is_set()` returns True and `update_event.clear()` is called, event is no longer set in `tests/unit/test_state_refresh.py`
-- [ ] T015 [US3] Run unit tests and confirm all tests in `tests/unit/test_state_refresh.py` pass
+- [x] T014 [US3] Write unit test `test_update_event_cleared_after_check` — assert that after `update_event.is_set()` returns True and `update_event.clear()` is called, event is no longer set in `tests/unit/test_state_refresh.py`
+- [x] T015 [US3] Run unit tests and confirm all tests in `tests/unit/test_state_refresh.py` pass
 
 **Checkpoint**: All three user stories verified. Full test suite green.
 
@@ -94,7 +94,7 @@ description: "Task list for automatic client screen refresh"
 
 ## Phase 5: Polish & Cross-Cutting Concerns
 
-- [ ] T016 Update WS Protocol Reference table in `AGENTS.md` — add note that `state`, `presence`, `lock_acquired`, `lock_released` frames set `ClientState.update_event` in `client/state.py`
+- [x] T016 Update WS Protocol Reference table in `AGENTS.md` — add note that `state`, `presence`, `lock_acquired`, `lock_released` frames set `ClientState.update_event` in `client/state.py`
 - [ ] T017 Run full quality gate and confirm all pass:
   ```bash
   pytest tests/unit -q

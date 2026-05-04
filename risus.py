@@ -3,8 +3,10 @@
 
 import argparse
 import atexit
+import io
 import json
 import os
+import select
 import sys
 import urllib.request
 from pathlib import Path
@@ -48,6 +50,37 @@ def show_state():
             lock_indicator = f" [locked by {locks[p.name]}]" if p.name in locks else ""
             print(f"  {p.name:<16} {dice_str:>9}  {cliche}{lock_indicator}")
     print()
+
+
+def _input_with_refresh(prompt: str) -> str:
+    """Synchronous input with periodic display refresh on state updates.
+
+    Replaces input() at the top-level menu only. Uses select.select with a
+    1-second timeout so the display can redraw when update_event is set by
+    the background WS reader. Blocks until a complete line is returned —
+    callers see no difference from input(). Terminal canonical mode keeps
+    partial keystrokes in the line buffer; they survive the redraw intact.
+
+    Permitted by constitution v1.1.1: synchronous stdlib-only polling wrapper,
+    no external dependencies, blocks until a complete line is returned.
+    """
+    sys.stdout.write(prompt)
+    sys.stdout.flush()
+    try:
+        while True:
+            ready, _, _ = select.select([sys.stdin], [], [], 1.0)
+            if ready:
+                return sys.stdin.readline().rstrip("\n").strip()
+            if _ws().state.update_event.is_set():
+                _ws().state.update_event.clear()
+                sys.stdout.write("\n")
+                show_state()
+                sys.stdout.write(prompt)
+                sys.stdout.flush()
+    except io.UnsupportedOperation:
+        # stdin is a pseudofile without fileno() (e.g. in tests); fall back to
+        # plain input() which honours builtins patches in the test environment.
+        return input("").strip()
 
 
 def prompt_int(prompt="Number: ") -> int | None:
@@ -321,7 +354,7 @@ def main():
         print("  5. Load")
         print("  6. Quit")
         print()
-        choice = input("> ").strip()
+        choice = _input_with_refresh("> ")
 
         if choice == "1":
             add_player()
