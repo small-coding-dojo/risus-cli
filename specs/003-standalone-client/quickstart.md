@@ -20,13 +20,7 @@ operating system:
 chmod +x risus-linux-x86_64   # replace with your filename
 ```
 
-**macOS note**: On first run macOS may block the app because it is not
-notarized. To allow it:
-
-1. Try to run it once — macOS shows a security warning and blocks it.
-2. Open **System Settings → Privacy & Security**.
-3. Scroll down to the blocked app and click **Allow Anyway**.
-4. Run the binary again — it will launch.
+**macOS note**: The binary is notarized. Gatekeeper allows it on first run without any manual steps.
 
 ## 3. Run
 
@@ -81,5 +75,5 @@ to set initial defaults before your first session.
 | ------- | --- |
 | `No response from server` | Check that the server is running and the address/port is correct |
 | Permission denied (Unix) | Run `chmod +x <filename>` first |
-| macOS blocks the app | Follow Step 2 above |
+| macOS blocks the app | Binary is notarized — if blocked, open System Settings → Privacy & Security and click Allow Anyway |
 | Windows SmartScreen warning | Click **More info → Run anyway** |

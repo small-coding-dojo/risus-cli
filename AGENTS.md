@@ -234,9 +234,9 @@ See `specs/005-macos-signed-release/quickstart.md` for full setup steps.
 
 | Secret | What it is | How to obtain |
 |--------|-----------|---------------|
-| `APPLE_CERTIFICATE` | Developer ID Application certificate + private key, exported as a `.p12` file and base64-encoded | Keychain Access → export the "Developer ID Application" cert as `.p12`; run `base64 -i cert.p12` |
+| `APPLE_CERTIFICATE` | Developer ID Application certificate + private key, exported as a `.p12` file and base64-encoded | Xcode → Settings → Accounts → Manage Certificates → right-click "Developer ID Application" → Export Certificate; run `base64 -i cert.p12 \| pbcopy` |
 | `APPLE_CERTIFICATE_PASSWORD` | Password set when exporting the `.p12` file | The password you chose during the `.p12` export |
-| `APPLE_TEAM_ID` | 10-character Apple Developer Team ID | [developer.apple.com/account](https://developer.apple.com/account) → Membership → Team ID |
+| `APPLE_SIGNING_IDENTITY` | Full codesign identity string | Run `security find-identity -v -p codesigning` and copy the full string, e.g. `Developer ID Application: Name (TEAMID)` |
 | `APPLE_API_KEY_ID` | App Store Connect API key ID | App Store Connect → Users and Access → Integrations → Keys → Key ID |
 | `APPLE_API_ISSUER_ID` | App Store Connect API issuer ID | Same page as above — Issuer ID shown at the top |
 | `APPLE_API_KEY_CONTENT` | Contents of the `.p8` private key file for the API key | Downloaded once when creating the API key; contents of the `.p8` file |
