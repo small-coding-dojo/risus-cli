@@ -169,8 +169,8 @@
     },
     {
       "path": "AGENTS.md",
-      "accessCount": 26,
-      "lastAccessed": 1777830524089,
+      "accessCount": 29,
+      "lastAccessed": 1777869979110,
       "type": "file"
     },
     {
@@ -216,6 +216,12 @@
       "type": "file"
     },
     {
+      "path": "specs/003-standalone-client/quickstart.md",
+      "accessCount": 14,
+      "lastAccessed": 1777870035001,
+      "type": "file"
+    },
+    {
       "path": "specs/003-standalone-client/plan.md",
       "accessCount": 13,
       "lastAccessed": 1777750552764,
@@ -223,8 +229,8 @@
     },
     {
       "path": "pyproject.toml",
-      "accessCount": 12,
-      "lastAccessed": 1777830092269,
+      "accessCount": 13,
+      "lastAccessed": 1777867903357,
       "type": "file"
     },
     {
@@ -249,6 +255,12 @@
       "path": "CLAUDE.md",
       "accessCount": 11,
       "lastAccessed": 1777831479114,
+      "type": "file"
+    },
+    {
+      "path": "PLAYER.md",
+      "accessCount": 11,
+      "lastAccessed": 1777870046991,
       "type": "file"
     },
     {
@@ -279,12 +291,6 @@
       "path": "specs/003-standalone-client/data-model.md",
       "accessCount": 9,
       "lastAccessed": 1777748689564,
-      "type": "file"
-    },
-    {
-      "path": "specs/003-standalone-client/quickstart.md",
-      "accessCount": 9,
-      "lastAccessed": 1777749902416,
       "type": "file"
     },
     {
@@ -363,12 +369,6 @@
       "path": "tests/e2e/test_token_auth.py",
       "accessCount": 5,
       "lastAccessed": 1777805532249,
-      "type": "file"
-    },
-    {
-      "path": "PLAYER.md",
-      "accessCount": 5,
-      "lastAccessed": 1777829220442,
       "type": "file"
     },
     {
