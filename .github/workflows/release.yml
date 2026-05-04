@@ -58,12 +58,12 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           codesign --force --verbose --timestamp \
-            --sign "Developer ID Application: $APPLE_TEAM_ID" \
+            --sign "$APPLE_SIGNING_IDENTITY" \
             --options=runtime --no-strict \
             --entitlements build/entitlements.plist \
             dist/risus-macos-arm64
         env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
 
       - name: Package signed binary
         if: runner.os == 'macOS'
