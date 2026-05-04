@@ -29,12 +29,12 @@ A developer with an Apple Developer Program account runs the release process and
 
 **Why this priority**: Without a repeatable notarization workflow the P1 user story cannot be fulfilled on each release.
 
-**Independent Test**: Run the release build process in a macOS environment with valid Apple Developer credentials. Verify the produced artifact passes `spctl` assessment and carries a valid code signature. Delivers a distributable binary independent of any end-user steps.
+**Independent Test**: Run the release build process in a macOS environment with valid Apple Developer credentials. Verify the produced artifact passes `codesign --verify` and carries a valid code signature. Delivers a distributable binary independent of any end-user steps.
 
 **Acceptance Scenarios**:
 
 1. **Given** a developer has valid Apple Developer Program credentials configured, **When** the release build process runs, **Then** it produces a signed and notarized artifact without manual intervention.
-2. **Given** the produced artifact, **When** `spctl --assess` is run against it, **Then** the assessment passes with `accepted` status.
+2. **Given** the produced artifact, **When** `codesign --verify` is run against it, **Then** the assessment passes with valid signature status.
 3. **Given** the produced artifact, **When** `codesign --verify` is run against it, **Then** the signature is valid and the signing identity is a trusted Apple Developer ID.
 
 ---
@@ -67,9 +67,9 @@ The CI/CD pipeline produces a notarized macOS artifact on each tagged release wi
 
 - **FR-001**: The macOS release artifact MUST be code-signed with a valid Apple Developer ID Application certificate.
 - **FR-002**: The macOS release artifact MUST be submitted to Apple for notarization and approved; Gatekeeper verifies the notarization record online on first run.
-- **FR-003**: The artifact MUST pass `spctl --assess` on a clean macOS system without any user-configured security exceptions.
-- **FR-004**: The release build process MUST accept Apple Developer credentials (Team ID, certificate, App-specific password or API key) via environment variables or secrets — no hard-coded credentials.
-- **FR-005**: The release process MUST fail with a clear error if code-signing or notarization fails, preventing distribution of an unsigned artifact.
+- **FR-003**: The artifact MUST be accepted by Gatekeeper on a clean macOS system without any user-configured security exceptions. (`codesign --verify` confirms the signature; `spctl --assess` is not used — it does not support plain Mach-O CLI binaries.)
+- **FR-004**: The release build process MUST accept Apple Developer credentials (signing identity, certificate, API key) via environment variables or secrets — no hard-coded credentials.
+- **FR-005**: On tagged releases, the pipeline MUST fail with a clear error if signing secrets are absent or if code-signing or notarization fails, preventing distribution of an unsigned artifact. On non-tag pushes (branches, PRs), signing steps MAY be skipped when secrets are not configured, allowing unsigned build verification without Apple credentials.
 - **FR-006**: The CI/CD pipeline MUST produce the notarized macOS artifact automatically on each tagged release.
 - **FR-007**: The artifact MUST run on the latest macOS release without additional configuration by the user.
 
@@ -85,7 +85,7 @@ The CI/CD pipeline produces a notarized macOS artifact on each tagged release wi
 
 - **SC-001**: A fresh macOS user can download and run the CLI in under 60 seconds with zero security dialogs or System Settings steps.
 - **SC-002**: 100% of tagged releases produce a notarized macOS artifact via the automated pipeline.
-- **SC-003**: `spctl --assess` returns `accepted` on every distributed artifact.
+- **SC-003**: `codesign --verify --deep --strict` passes on every distributed artifact. (Note: `spctl --assess --type execute` does not support plain Mach-O CLI binaries and is not used as a verification gate.)
 - **SC-004**: The release build process completes notarization in under 15 minutes per release.
 - **SC-005**: Zero support requests related to macOS Gatekeeper or "unidentified developer" blocks after the feature ships.
 

@@ -15,7 +15,7 @@ Add Apple code signing and notarization to the macOS job in the existing GitHub 
 **Signing Tool**: `codesign` (Xcode Command Line Tools, pre-installed on macOS runners)  
 **Notarization Tool**: `xcrun notarytool` (Xcode 13+, pre-installed on macOS runners)  
 **Storage**: N/A  
-**Testing**: Manual verification via `spctl --assess` and `codesign --verify` on produced artifact  
+**Testing**: Manual verification via `codesign --verify` on produced artifact (`spctl --assess --type execute` is not used — it does not support plain Mach-O CLI binaries)  
 **Target Platform**: Latest macOS release, arm64 (`macos-latest` runner)  
 **Project Type**: CLI binary distribution  
 **Performance Goals**: Notarization completes within 15 minutes per release  
@@ -31,7 +31,7 @@ Add Apple code signing and notarization to the macOS job in the existing GitHub 
 | I. Server Authority | ✅ PASS | Build/release concern only; no runtime state changes |
 | II. Simplicity | ✅ PASS | Touches only `release.yml` (macOS job) and adds `build/entitlements.plist`; zero UX or menu changes |
 | III. No Duplication | ✅ PASS | Signing logic lives in one place (`release.yml` macOS job) |
-| IV. Testing Discipline | ✅ PASS | No new runtime code; verification via `spctl --assess` on artifact |
+| IV. Testing Discipline | ✅ PASS | No new runtime code; verification via `codesign --verify` on artifact |
 | V. No Local Persistence | ✅ PASS | Build artifact, not runtime state |
 
 No violations. Complexity Tracking table omitted.
@@ -63,3 +63,13 @@ build/
 ```
 
 **Structure Decision**: Single-project layout. Only build tooling files change; no src/ changes.
+
+## Notes
+
+- All signing steps guarded by `if: runner.os == 'macOS'` — Linux/Windows jobs unchanged
+- Signing steps additionally gated on `env.APPLE_CERTIFICATE != ''` — branches/PRs without secrets produce an unsigned binary; tagged releases assert secrets are present and fail loudly if missing
+- `APPLE_SIGNING_IDENTITY` holds the full codesign identity string (`Developer ID Application: Name (TEAMID)`) — verify via `security find-identity -v -p codesigning`; `APPLE_TEAM_ID` alone is not a valid identity
+- `spctl --assess --type execute` is NOT used — fails for plain Mach-O CLI binaries; use `codesign --verify` instead
+- `xcrun notarytool submit --wait` typically completes in 1–5 min; 15-min timeout well within GitHub Actions defaults
+- Keychain cleanup uses `if: always()` — runs even if signing or notarization fails
+- Only the zip (`risus-macos-arm64.zip`) is uploaded; bare binary not distributed

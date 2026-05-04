@@ -80,6 +80,12 @@ version = "1.x.y"
 
 The tag must match the version (e.g. `version = "1.0.5"` → tag `v1.0.5`).
 
+## Conditional signing
+
+Signing steps only run when `APPLE_CERTIFICATE` is configured as a repository secret. On branches and PRs where secrets are absent, the macOS job builds an unsigned binary — useful for verifying the build without Apple credentials.
+
+On **tagged releases**, the pipeline asserts that secrets are present and fails loudly if they are missing. This prevents accidentally publishing an unsigned artifact.
+
 ## Triggering a release
 
 ```bash
